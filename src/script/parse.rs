@@ -1,4 +1,5 @@
 use nom::IResult;
+use nom::Err;
 use nom::error::ParseError;
 
 use nom::{
@@ -26,15 +27,15 @@ pub fn load_script(filename: &str) -> Result<(), String> {
     let res = parse_comment::<nom::error::VerboseError<&str>>(&body)
         .map_err(|err| {
             match err {
-                nom::Err::Error(verberr) => {
+                Err::Error(verberr) => {
                     let errstr = nom::error::convert_error::<&str>(&body, verberr);
                     format!("{}: script format:\n... {}", filename, errstr)
                 },
-                nom::Err::Failure(verberr) => {
+                Err::Failure(verberr) => {
                     let errstr = nom::error::convert_error::<&str>(&body, verberr);
                     format!("{}: script format:\n... {}", filename, errstr)
                 },
-                nom::Err::Incomplete(_) => {
+                Err::Incomplete(_) => {
                     format!("{}: incomplete parse", filename)
                 },
             }
