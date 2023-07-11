@@ -3,6 +3,7 @@
 use gumdrop::Options;
 
 mod run;
+mod script;
 
 #[derive(Options, Debug)]
 pub struct AppOptions {
