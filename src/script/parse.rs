@@ -26,9 +26,18 @@ pub fn load_script(filename: &str) -> Result<(), String> {
     // res: Result<(&str, ()), nom::Err<VerboseError<&str>>>
     
     if let Err(err) = res {
-        if let nom::Err::Error(verberr) = err {
-            let errstr = nom::error::convert_error::<&str>(&body, verberr);
-            return Err(format!("{}: script format:\n... {}", filename, errstr));
+        match err {
+            nom::Err::Error(verberr) => {
+                let errstr = nom::error::convert_error::<&str>(&body, verberr);
+                return Err(format!("{}: script format:\n... {}", filename, errstr));
+            },
+            nom::Err::Failure(verberr) => {
+                let errstr = nom::error::convert_error::<&str>(&body, verberr);
+                return Err(format!("{}: script format:\n... {}", filename, errstr));
+            },
+            nom::Err::Incomplete(_) => {
+                return Err(format!("{}: incomplete parse", filename));
+            },
         }
     }
 
