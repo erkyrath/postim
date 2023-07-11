@@ -22,24 +22,23 @@ pub fn load_script(filename: &str) -> Result<(), String> {
             format!("{}: {}", filename, err.to_string())
         })?;
 
-    let res = parse_comment::<nom::error::VerboseError<&str>>(&body);
     // res: Result<(&str, ()), nom::Err<VerboseError<&str>>>
+    let res = parse_comment::<nom::error::VerboseError<&str>>(&body)
+        .map_err(|err| {
+            match err {
+                nom::Err::Error(verberr) => {
+                    let errstr = nom::error::convert_error::<&str>(&body, verberr);
+                    format!("{}: script format:\n... {}", filename, errstr)
+                },
+                nom::Err::Failure(verberr) => {
+                    let errstr = nom::error::convert_error::<&str>(&body, verberr);
+                    format!("{}: script format:\n... {}", filename, errstr)
+                },
+                nom::Err::Incomplete(_) => {
+                    format!("{}: incomplete parse", filename)
+                },
+            }
+        })?;
     
-    if let Err(err) = res {
-        match err {
-            nom::Err::Error(verberr) => {
-                let errstr = nom::error::convert_error::<&str>(&body, verberr);
-                return Err(format!("{}: script format:\n... {}", filename, errstr));
-            },
-            nom::Err::Failure(verberr) => {
-                let errstr = nom::error::convert_error::<&str>(&body, verberr);
-                return Err(format!("{}: script format:\n... {}", filename, errstr));
-            },
-            nom::Err::Incomplete(_) => {
-                return Err(format!("{}: incomplete parse", filename));
-            },
-        }
-    }
-
-    Ok(())
+    Ok(res.1)
 }
