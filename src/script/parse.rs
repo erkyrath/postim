@@ -21,7 +21,10 @@ pub fn parse_comment<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a 
 pub fn load_script(filename: &str) -> Result<(), Box<dyn Error>> {
     let body = std::fs::read_to_string(filename)?;
 
-    parse_comment::<()>(&body)?;
+    // See nom "error_management.md" for this to_owned() business.
+    
+    parse_comment(&body)
+        .map_err(|e: nom::Err<nom::error::Error<&str>>| e.to_owned())?;
 
     Ok(())
 }
