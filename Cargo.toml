@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 gumdrop = "0.8.1"
+nom = "7.1.3"
