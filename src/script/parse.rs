@@ -22,7 +22,7 @@ pub fn load_script(filename: &str) -> Result<(), String> {
             format!("{}: {}", filename, err.to_string())
         })?;
 
-    // res: Result<(&str, ()), nom::Err<VerboseError<&str>>>
+    // parse_comment() returns Result<(&str,()), nom::Err<VerboseError<&str>>>
     let res = parse_comment::<nom::error::VerboseError<&str>>(&body)
         .map_err(|err| {
             match err {
