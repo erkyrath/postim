@@ -1,5 +1,4 @@
 use std::error::Error;
-
 use nom::IResult;
 use nom::error::ParseError;
 
@@ -21,10 +20,15 @@ pub fn parse_comment<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a 
 pub fn load_script(filename: &str) -> Result<(), Box<dyn Error>> {
     let body = std::fs::read_to_string(filename)?;
 
-    // See nom "error_management.md" for this to_owned() business.
+    let res = parse_comment::<nom::error::VerboseError<&str>>(&body);
+    // res: Result<(&str, ()), nom::Err<VerboseError<&str>>>
     
-    parse_comment(&body)
-        .map_err(|e: nom::Err<nom::error::Error<&str>>| e.to_owned())?;
+    if let Err(err) = res {
+        if let nom::Err::Error(verberr) = err {
+            let errstr = nom::error::convert_error::<&str>(&body, verberr);
+            println!("{filename}: {errstr}");
+        }
+    }
 
     Ok(())
 }
