@@ -18,7 +18,9 @@ pub fn parse_comment<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a 
 
 pub fn load_script(filename: &str) -> Result<(), String> {
     let body = std::fs::read_to_string(filename)
-        .map_err(|err| err.to_string())?;
+        .map_err(|err| {
+            format!("{}: {}", filename, err.to_string())
+        })?;
 
     let res = parse_comment::<nom::error::VerboseError<&str>>(&body);
     // res: Result<(&str, ()), nom::Err<VerboseError<&str>>>
@@ -26,8 +28,7 @@ pub fn load_script(filename: &str) -> Result<(), String> {
     if let Err(err) = res {
         if let nom::Err::Error(verberr) = err {
             let errstr = nom::error::convert_error::<&str>(&body, verberr);
-            println!("{filename}: {errstr}");
-            return Err("BAD".to_string());
+            return Err(format!("{}: script format:\n... {}", filename, errstr));
         }
     }
 
