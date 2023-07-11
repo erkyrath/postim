@@ -1,10 +1,11 @@
 #![allow(dead_code)]
 
-use std::error::Error;
 use gumdrop::Options;
 
+mod run;
+
 #[derive(Options, Debug)]
-struct AppOptions {
+pub struct AppOptions {
     #[options(free)]
     script: Vec<String>,
 
@@ -21,13 +22,8 @@ struct AppOptions {
 fn main() {
     let opts = AppOptions::parse_args_default_or_exit();
 
-    run(&opts).unwrap_or_else(|err| {
+    run::run(&opts).unwrap_or_else(|err| {
         println!("Error: {err}");
     });
 }
 
-fn run(opts: &AppOptions) -> Result<(), Box<dyn Error>> {
-    println!("### {} in, {} out", opts.infiles.len(), opts.outfiles.len());
-    
-    Ok(())
-}
