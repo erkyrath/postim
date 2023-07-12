@@ -4,13 +4,17 @@ use nom::error::ParseError;
 
 use nom::{
     combinator::value,
+    combinator::recognize,
+    combinator::map,
     combinator::eof,
     sequence::pair,
     sequence::terminated,
     branch::alt,
     multi::many0,
+    multi::many1,
     bytes::complete::is_not,
     character::complete::char,
+    character::complete::one_of,
     character::complete::multispace1,
 };
 
@@ -18,6 +22,7 @@ use nom::{
 pub enum ScriptToken {
     Whitespace,
     Comment,
+    Integer(i32),
 }
 
 pub fn parse_comment<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
@@ -31,6 +36,18 @@ pub fn parse_whitespace<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&
     value(
         ScriptToken::Whitespace,
         multispace1
+    )(input)
+}
+
+pub fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
+    map(
+       recognize(
+           many1(one_of("0123456789"))
+       ),
+       |val: &str| {
+           let ival = i32::from_str_radix(&val, 10).unwrap();
+           ScriptToken::Integer(ival)
+       }
     )(input)
 }
 
