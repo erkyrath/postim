@@ -4,7 +4,9 @@ use nom::error::ParseError;
 
 use nom::{
     combinator::value,
+    combinator::eof,
     sequence::pair,
+    sequence::terminated,
     branch::alt,
     multi::many0,
     bytes::complete::is_not,
@@ -40,8 +42,9 @@ pub fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a
 }
 
 pub fn parse_anytokenlist<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, Vec<ScriptToken>, E> {
-    many0(
-        parse_anytoken
+    terminated(
+        many0(parse_anytoken),
+        eof
     )(input)
 }
 
