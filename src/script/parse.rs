@@ -17,6 +17,7 @@ pub enum ScriptToken {
     Whitespace,
     Comment,
     Name(String),
+    String(String),
     Integer(i32),
     Float(f32),
     Size(i32, i32),
@@ -45,6 +46,18 @@ pub fn parse_oparrow<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a 
     combinator::map(
         bytes::complete::tag(">>"),
         |_| ScriptToken::OpArrow
+    )(input)
+}
+
+pub fn parse_string<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
+    combinator::map(
+        // for escaped chars, see https://github.com/rust-bakery/nom/blob/main/examples/string.rs
+        sequence::delimited(
+            character::complete::char('"'),
+            bytes::complete::is_not("\""),
+            character::complete::char('"')
+        ),
+        |val: &str| ScriptToken::String(val.to_string())
     )(input)
 }
 
@@ -165,6 +178,7 @@ pub fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a
         parse_comment,
         parse_whitespace,
         parse_oparrow,
+        parse_string,
         parse_name,
         parse_integer,
         parse_float,
