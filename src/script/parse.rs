@@ -208,7 +208,38 @@ pub fn load_script(filename: &str) -> Result<Script, String> {
             }
         })?;
 
-    let (_, ls) = res;
+    let (_, rawtokens) = res;
 
-    Ok(Script::new(ls))
+    let mut tokens: Vec<ScriptToken> = Vec::new();
+    let mut wasarrow = false;
+    
+    for tok in rawtokens {    // consume original
+        match tok {
+            ScriptToken::Whitespace => {},
+            ScriptToken::Comment => {},
+            ScriptToken::OpArrow => {
+                wasarrow = true;
+            }
+            ScriptToken::Name(val) => {
+                if wasarrow {
+                    wasarrow = false;
+                    tokens.push(ScriptToken::StoreTo(val));
+                }
+                else {
+                    tokens.push(ScriptToken::Name(val));
+                }
+            }
+            other => {
+                if wasarrow {
+                    return Err(format!("{}: arrow needs name, found {:?}", filename, other));
+                }
+                tokens.push(other);
+            },
+        }
+    }
+    if wasarrow {
+        return Err(format!("{}: arrow needs name", filename));
+    }
+
+    Ok(Script::new(tokens))
 }
