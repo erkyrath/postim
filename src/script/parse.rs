@@ -126,13 +126,31 @@ pub fn parse_color<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a st
             combinator::peek(parse_tokterminator)
         ))
     )(input)?;
- 
+
+    let phex = &pstr[1..];
     
-    let ival = i32::from_str_radix(pstr, 10).
+    let uval = u32::from_str_radix(phex, 16).
         map_err(|_err| {
             Err::Failure(E::from_error_kind(pinput, ErrorKind::Fail))
         })?;
-    return Ok( (pinput, ScriptToken::Integer(ival)) );
+
+    if phex.len() == 6 {
+        let tok = ScriptToken::Color(
+            (uval >> 16 & 0xFF) as u8,
+            (uval >> 8 & 0xFF) as u8,
+            (uval & 0xFF) as u8);
+        Ok( (pinput, tok) )
+    }
+    else if phex.len() == 3 {
+        let tok = ScriptToken::Color(
+            0x11 * (uval >> 8 & 0x0F) as u8,
+            0x11 * (uval >> 4 & 0x0F) as u8,
+            0x11 * (uval & 0x0F) as u8);
+        Ok( (pinput, tok) )
+    }
+    else {
+        Err(Err::Failure(E::from_error_kind(pinput, ErrorKind::Fail)))
+    }
 }
 
 pub fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
