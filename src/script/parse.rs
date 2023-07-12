@@ -5,9 +5,16 @@ use nom::error::ParseError;
 use nom::{
     combinator::value,
     sequence::pair,
+    branch::alt,
     bytes::complete::is_not,
     character::complete::char,
+    character::complete::multispace1,
 };
+
+enum ScriptToken {
+    Whitespace,
+    Comment,
+}
 
 pub fn parse_comment<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, (), E> {
     value(
@@ -16,6 +23,19 @@ pub fn parse_comment<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a 
     )(input)
 }
 
+pub fn parse_whitespace<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, (), E> {
+    value(
+        (),
+        multispace1
+    )(input)
+}
+
+pub fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, (), E> {
+    alt((
+        parse_comment,
+        parse_whitespace
+    ))(input)
+}
 
 pub fn load_script(filename: &str) -> Result<(), String> {
     let body = std::fs::read_to_string(filename)
@@ -23,8 +43,8 @@ pub fn load_script(filename: &str) -> Result<(), String> {
             format!("{}: {}", filename, err.to_string())
         })?;
 
-    // parse_comment() returns Result<(&str,()), nom::Err<VerboseError<&str>>>
-    let res = parse_comment::<nom::error::VerboseError<&str>>(&body)
+    // parser returns Result<(&str,()), nom::Err<VerboseError<&str>>>
+    let res = parse_anytoken::<nom::error::VerboseError<&str>>(&body)
         .map_err(|err| {
             match err {
                 Err::Error(verberr) => {
