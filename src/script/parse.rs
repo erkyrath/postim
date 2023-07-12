@@ -92,17 +92,18 @@ pub fn parse_size<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str
    let (pinput, (pstr1, pstr2)) =
    sequence::separated_pair(
        combinator::recognize(
-           sequence::pair(
+           sequence::tuple((
                combinator::opt(character::complete::char('-')),
                character::complete::digit1,
-           )
+           ))
        ),
        character::complete::char('x'),
        combinator::recognize(
-           sequence::pair(
+           sequence::tuple((
                combinator::opt(character::complete::char('-')),
                character::complete::digit1,
-           )
+               combinator::peek(parse_tokterminator)
+           ))
        )
    )(input)?;
 
