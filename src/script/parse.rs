@@ -18,6 +18,7 @@ pub enum ScriptToken {
     Comment,
     Integer(i32),
     Float(f32),
+    Name(String),
 }
 
 pub fn parse_comment<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
@@ -43,6 +44,18 @@ pub fn parse_tokterminator<'a, E: ParseError<&'a str>>(input: &'a str) -> IResul
         character::complete::multispace1,
         bytes::complete::take_while1(|ch: char| ch == '#' || ch == '-' || ch == '+' || ch == '<' || ch == '>')
     ))(input)
+}
+
+pub fn parse_name<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
+   let (pinput, pstr) = combinator::recognize(
+       sequence::tuple((
+           character::complete::alpha1,
+           character::complete::alphanumeric0,
+           combinator::peek(parse_tokterminator)
+       ))
+   )(input)?;
+
+   return Ok( (pinput, ScriptToken::Name(pstr.to_string())) );
 }
 
 pub fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
@@ -75,6 +88,7 @@ pub fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a
     branch::alt((
         parse_comment,
         parse_whitespace,
+        parse_name,
         parse_integer,
         parse_float,
     ))(input)
