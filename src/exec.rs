@@ -1,6 +1,9 @@
 use crate::script::Script;
+use crate::exec::except::ExecError;
 
 use std::collections::HashMap;
+
+pub mod except;
 
 #[derive(Debug, Clone)]
 pub enum StackValue {
@@ -23,7 +26,17 @@ impl ExecContext {
         }
     }
 
-    pub fn execute(&mut self, script: &Script) {
+    pub fn push(&mut self, val: StackValue) {
+        self.stack.push(val);
+    }
+
+    pub fn execute(&mut self, script: &Script) -> Result<(), ExecError> {
         println!("### running {:?}", script);
+
+        for tok in script.tokens() {
+            return Err(ExecError::new("BAD"));
+        }
+
+        Ok(())
     }
 }

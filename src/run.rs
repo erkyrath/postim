@@ -16,7 +16,7 @@ pub fn run(opts: &AppOptions) -> Result<(), Box<dyn Error>> {
     let mut ctx = ExecContext::new();
 
     for script in &scripts {
-        ctx.execute(&script);
+        ctx.execute(&script)?;
     }
     
     Ok(())

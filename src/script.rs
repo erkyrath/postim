@@ -28,6 +28,10 @@ impl Script {
             tokens
         }
     }
+
+    pub fn tokens(&self) -> &[ScriptToken] {
+        return &self.tokens;
+    }
 }
 
 impl fmt::Debug for Script {
