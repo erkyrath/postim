@@ -1,6 +1,7 @@
 use nom::IResult;
 use nom::Err;
 use nom::error::ParseError;
+use nom::error::VerboseError;
 
 use nom::{
     combinator::value,
@@ -73,7 +74,7 @@ pub fn load_script(filename: &str) -> Result<(), String> {
 
     // parser returns Result<(&str, ScriptToken), nom::Err<VerboseError<&str>>>
     
-    let res = parse_anytokenlist::<nom::error::VerboseError<&str>>(&body)
+    let res = parse_anytokenlist::<VerboseError<&str>>(&body)
         .map_err(|err| {
             match err {
                 Err::Error(verberr) => {
