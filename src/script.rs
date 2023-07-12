@@ -1,3 +1,5 @@
+use std::fmt;
+
 pub mod parse;
 
 #[derive(Debug, Clone)]
@@ -25,5 +27,11 @@ impl Script {
             filename: filename.to_string(),
             tokens
         }
+    }
+}
+
+impl fmt::Debug for Script {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "<Script \"{}\">", self.filename)
     }
 }

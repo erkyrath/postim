@@ -24,5 +24,6 @@ impl ExecContext {
     }
 
     pub fn execute(&mut self, script: &Script) {
+        println!("### running {:?}", script);
     }
 }
