@@ -39,10 +39,16 @@ pub fn parse_whitespace<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&
 
 pub fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
    let (pinput, pstr) = combinator::recognize(
-       sequence::pair(
+       sequence::tuple((
            combinator::opt(character::complete::char('-')),
-           character::complete::digit1
-       )
+           character::complete::digit1,
+           combinator::peek(
+               branch::alt((
+                   combinator::eof,
+                   bytes::complete::take_till1(|ch: char| ch == '.' || ch == '_' || ch.is_ascii_alphabetic())
+               ))
+           )
+       ))
    )(input)?;
 
    let ival = i32::from_str_radix(pstr, 10).
