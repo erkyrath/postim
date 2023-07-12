@@ -60,7 +60,8 @@ pub fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a 
 pub fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     alt((
         parse_comment,
-        parse_whitespace
+        parse_whitespace,
+        parse_integer,
     ))(input)
 }
 
