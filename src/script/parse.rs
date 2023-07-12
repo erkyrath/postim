@@ -13,10 +13,9 @@ use nom::{
     sequence::terminated,
     branch::alt,
     multi::many0,
-    multi::many1,
     bytes::complete::is_not,
     character::complete::char,
-    character::complete::one_of,
+    character::complete::digit1,
     character::complete::multispace1,
 };
 
@@ -47,7 +46,7 @@ pub fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a 
        recognize(
            pair(
                opt(char('-')),
-               many1(one_of("0123456789"))
+               digit1
            )
        ),
        |val: &str| {
