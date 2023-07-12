@@ -5,6 +5,7 @@ use crate::exec::except::ExecError;
 use std::collections::HashMap;
 
 pub mod except;
+pub mod builtin;
 
 #[derive(Debug, Clone)]
 pub enum StackValue {
@@ -48,8 +49,11 @@ impl ExecContext {
                 ScriptToken::Size(valx, valy) => {
                     self.push(StackValue::Size(*valx, *valy));
                 },
+                ScriptToken::Name(val) => {
+                    self.execute_builtin(val)?;
+                },
                 other => {
-                    let msg = format!("Unknown token: {:?}", other);
+                    let msg = format!("unknown token: {:?}", other);
                     return Err(ExecError::new(&msg))
                 },
             }
