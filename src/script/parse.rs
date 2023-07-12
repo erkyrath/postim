@@ -2,6 +2,7 @@ use nom::IResult;
 use nom::Err;
 use nom::error::ParseError;
 use nom::error::VerboseError;
+use nom::error::ErrorKind;
 
 use nom::{
     combinator::value,
@@ -25,7 +26,6 @@ pub enum ScriptToken {
     Comment,
     Integer(i32),
     Float(f32),
-    BadToken(String),
 }
 
 pub fn parse_comment<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
@@ -50,13 +50,11 @@ pub fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a 
        )
    )(input)?;
 
-   if let Ok(ival) = i32::from_str_radix(pstr, 10) {
-       return Ok( (pinput, ScriptToken::Integer(ival)) );
-   }
-   else {
-       //return Err(nom::Err::Failure(E::from_error_kind(pinput, nom::error::ErrorKind::Fail)));
-       return nom::combinator::fail(input);
-   }
+   let ival = i32::from_str_radix(pstr, 10).
+       map_err(|_err| {
+           Err::Failure(E::from_error_kind(pinput, ErrorKind::Fail))
+       })?;
+   return Ok( (pinput, ScriptToken::Integer(ival)) );
 }
 
 pub fn parse_float<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
