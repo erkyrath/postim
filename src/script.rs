@@ -21,7 +21,7 @@ pub struct Script {
 impl Script {
     pub fn new(tokens: Vec<ScriptToken>) -> Script {
         Script {
-	    tokens
-	}
+            tokens
+        }
     }
 }
