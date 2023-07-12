@@ -1,4 +1,5 @@
 use crate::script::Script;
+use crate::script::ScriptToken;
 use crate::exec::except::ExecError;
 
 use std::collections::HashMap;
@@ -35,6 +36,12 @@ impl ExecContext {
 
         for tok in script.tokens() {
             match tok {
+                ScriptToken::Integer(val) => {
+                    self.push(StackValue::Integer(*val));
+                },
+                ScriptToken::Float(val) => {
+                    self.push(StackValue::Float(*val));
+                },
                 other => {
                     let msg = format!("Unknown token: {:?}", other);
                     return Err(ExecError::new(&msg))
