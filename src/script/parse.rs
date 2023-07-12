@@ -50,8 +50,8 @@ pub fn parse_name<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str
     combinator::map(
         combinator::recognize(
             sequence::tuple((
-                character::complete::alpha1,
-                character::complete::alphanumeric0,
+                bytes::complete::take_while1(|ch: char| ch == '_' || ch.is_ascii_alphabetic()),
+                bytes::complete::take_while(|ch: char| ch == '_' || ch.is_ascii_alphanumeric()),
                 combinator::peek(parse_tokterminator)
             ))
         ),
