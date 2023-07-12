@@ -34,7 +34,12 @@ impl ExecContext {
         println!("### running {:?}", script);
 
         for tok in script.tokens() {
-            return Err(ExecError::new("BAD"));
+            match tok {
+                other => {
+                    let msg = format!("Unknown token: {:?}", other);
+                    return Err(ExecError::new(&msg))
+                },
+            }
         }
 
         Ok(())
