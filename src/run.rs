@@ -4,6 +4,7 @@ use crate::AppOptions;
 
 use crate::script::Script;
 use crate::script::parse::load_script;
+use crate::exec::ExecContext;
 
 pub fn run(opts: &AppOptions) -> Result<(), Box<dyn Error>> {
 
@@ -11,8 +12,12 @@ pub fn run(opts: &AppOptions) -> Result<(), Box<dyn Error>> {
         .iter()
         .map(|filename| load_script(&filename))
         .collect::<Result<Vec<_>, _>>()?;
-    
-    println!("### loaded {} scripts", scripts.len());
+
+    let mut ctx = ExecContext::new();
+
+    for script in &scripts {
+        ctx.execute(&script);
+    }
     
     Ok(())
 }

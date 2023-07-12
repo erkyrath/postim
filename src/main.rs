@@ -4,6 +4,7 @@ use gumdrop::Options;
 
 mod run;
 mod script;
+mod exec;
 
 #[derive(Options, Debug)]
 pub struct AppOptions {

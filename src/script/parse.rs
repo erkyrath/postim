@@ -241,5 +241,5 @@ pub fn load_script(filename: &str) -> Result<Script, String> {
         return Err(format!("{}: arrow needs name", filename));
     }
 
-    Ok(Script::new(tokens))
+    Ok(Script::new(filename, tokens))
 }

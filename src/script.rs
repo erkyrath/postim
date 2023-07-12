@@ -15,12 +15,14 @@ pub enum ScriptToken {
 }
 
 pub struct Script {
+    filename: String,
     tokens: Vec<ScriptToken>,
 }
 
 impl Script {
-    pub fn new(tokens: Vec<ScriptToken>) -> Script {
+    pub fn new(filename: &str, tokens: Vec<ScriptToken>) -> Script {
         Script {
+            filename: filename.to_string(),
             tokens
         }
     }
