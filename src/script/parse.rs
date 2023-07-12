@@ -11,6 +11,7 @@ use nom::branch;
 use nom::bytes;
 use nom::character;
 
+use crate::script::Script;
 use crate::script::ScriptToken;
 
 pub fn parse_comment<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
@@ -182,13 +183,13 @@ pub fn parse_anytokenlist<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult
     )(input)
 }
 
-pub fn load_script(filename: &str) -> Result<(), String> {
+pub fn load_script(filename: &str) -> Result<Script, String> {
     let body = std::fs::read_to_string(filename)
         .map_err(|err| {
             format!("{}: {}", filename, err.to_string())
         })?;
 
-    // parser returns Result<(&str, ScriptToken), nom::Err<VerboseError<&str>>>
+    // parser returns Result<(&str, Vec<ScriptToken>), nom::Err<VerboseError<&str>>>
     
     let res = parse_anytokenlist::<VerboseError<&str>>(&body)
         .map_err(|err| {
@@ -207,7 +208,7 @@ pub fn load_script(filename: &str) -> Result<(), String> {
             }
         })?;
 
-    println!("### parsed: {:?}", res.1);
-    
-    Ok(())
+    let (_, ls) = res;
+
+    Ok(Script::new(ls))
 }
