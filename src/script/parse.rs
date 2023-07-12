@@ -5,6 +5,7 @@ use nom::error::VerboseError;
 
 use nom::{
     combinator::value,
+    combinator::opt,
     combinator::recognize,
     combinator::map,
     combinator::eof,
@@ -44,7 +45,10 @@ pub fn parse_whitespace<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&
 pub fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     map(
        recognize(
-           many1(one_of("0123456789"))
+           pair(
+               opt(char('-')),
+               many1(one_of("0123456789"))
+           )
        ),
        |val: &str| {
            if let Ok(ival) = i32::from_str_radix(&val, 10) {
