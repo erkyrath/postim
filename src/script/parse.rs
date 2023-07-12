@@ -43,22 +43,20 @@ pub fn parse_whitespace<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&
 }
 
 pub fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
-    map(
-       recognize(
-           pair(
-               opt(char('-')),
-               digit1
-           )
-       ),
-       |val: &str| {
-           if let Ok(ival) = i32::from_str_radix(&val, 10) {
-               ScriptToken::Integer(ival)
-           }
-           else {
-               ScriptToken::BadToken(val.to_string())
-           }
-       }
-    )(input)
+   let (pinput, pstr) = recognize(
+       pair(
+           opt(char('-')),
+           digit1
+       )
+   )(input)?;
+
+   if let Ok(ival) = i32::from_str_radix(pstr, 10) {
+       return Ok( (pinput, ScriptToken::Integer(ival)) );
+   }
+   else {
+       //return Err(nom::Err::Failure(E::from_error_kind(pinput, nom::error::ErrorKind::Fail)));
+       return nom::combinator::fail(input);
+   }
 }
 
 pub fn parse_float<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
