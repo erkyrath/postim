@@ -11,19 +11,7 @@ use nom::branch;
 use nom::bytes;
 use nom::character;
 
-
-#[derive(Debug, Clone)]
-pub enum ScriptToken {
-    Whitespace,
-    Comment,
-    Name(String),
-    String(String),
-    Integer(i32),
-    Float(f32),
-    Size(i32, i32),
-    Color(u8, u8, u8),
-    OpArrow,
-}
+use crate::script::ScriptToken;
 
 pub fn parse_comment<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     combinator::value(
