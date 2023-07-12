@@ -4,9 +4,9 @@ pub mod parse;
 
 #[derive(Debug, Clone)]
 pub enum ScriptToken {
-    Whitespace,
-    Comment,
-    OpArrow,
+    Whitespace,   // parse only
+    Comment,      // parse only
+    OpArrow,      // parse only
     Name(String),
     StoreTo(String),
     String(String),
