@@ -45,7 +45,8 @@ pub fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a 
            combinator::peek(
                branch::alt((
                    combinator::eof,
-                   bytes::complete::take_till1(|ch: char| ch == '.' || ch == '_' || ch.is_ascii_alphabetic())
+                   character::complete::multispace1,
+                   bytes::complete::take_while1(|ch: char| ch == '#' || ch == '-' || ch == '+' || ch == '<' || ch == '>')
                ))
            )
        ))
@@ -70,7 +71,7 @@ pub fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a
         parse_comment,
         parse_whitespace,
         parse_integer,
-        parse_float,
+        //###parse_float,
     ))(input)
 }
 
