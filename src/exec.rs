@@ -57,6 +57,10 @@ impl ExecContext {
                         self.execute_builtin(val)?;
                     }
                 },
+                ScriptToken::StoreTo(val) => {
+                    let stackval = self.stack.pop().ok_or_else(|| ExecError::new("stack underflow") )?;
+                    self.heap.insert(val.to_string(), stackval);
+                }
                 other => {
                     let msg = format!("unknown token: {:?}", other);
                     return Err(ExecError::new(&msg))
