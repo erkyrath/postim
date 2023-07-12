@@ -8,13 +8,9 @@ use nom::sequence;
 use nom::combinator;
 use nom::multi;
 use nom::branch;
+use nom::bytes;
+use nom::character;
 
-use nom::{
-    bytes::complete::is_not,
-    character::complete::char,
-    character::complete::digit1,
-    character::complete::multispace1,
-};
 
 #[derive(Debug, Clone)]
 pub enum ScriptToken {
@@ -27,22 +23,25 @@ pub enum ScriptToken {
 pub fn parse_comment<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     combinator::value(
         ScriptToken::Comment,
-        sequence::pair(char('#'), is_not("\n\r"))
+        sequence::pair(
+            character::complete::char('#'),
+            bytes::complete::is_not("\n\r")
+        )
     )(input)
 }
 
 pub fn parse_whitespace<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     combinator::value(
         ScriptToken::Whitespace,
-        multispace1
+        character::complete::multispace1
     )(input)
 }
 
 pub fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
    let (pinput, pstr) = combinator::recognize(
        sequence::pair(
-           combinator::opt(char('-')),
-           digit1
+           combinator::opt(character::complete::char('-')),
+           character::complete::digit1
        )
    )(input)?;
 
