@@ -41,6 +41,13 @@ pub fn parse_whitespace<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&
     )(input)
 }
 
+pub fn parse_oparrow<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
+    combinator::map(
+        bytes::complete::tag(">>"),
+        |_| ScriptToken::OpArrow
+    )(input)
+}
+
 pub fn parse_tokterminator<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, &str, E> {
     branch::alt((
         combinator::eof,
@@ -157,6 +164,7 @@ pub fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a
     branch::alt((
         parse_comment,
         parse_whitespace,
+        parse_oparrow,
         parse_name,
         parse_integer,
         parse_float,
