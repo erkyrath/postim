@@ -37,18 +37,20 @@ pub fn parse_whitespace<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&
     )(input)
 }
 
+pub fn parse_tokterminator<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, &str, E> {
+    branch::alt((
+        combinator::eof,
+        character::complete::multispace1,
+        bytes::complete::take_while1(|ch: char| ch == '#' || ch == '-' || ch == '+' || ch == '<' || ch == '>')
+    ))(input)
+}
+
 pub fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
    let (pinput, pstr) = combinator::recognize(
        sequence::tuple((
            combinator::opt(character::complete::char('-')),
            character::complete::digit1,
-           combinator::peek(
-               branch::alt((
-                   combinator::eof,
-                   character::complete::multispace1,
-                   bytes::complete::take_while1(|ch: char| ch == '#' || ch == '-' || ch == '+' || ch == '<' || ch == '>')
-               ))
-           )
+           combinator::peek(parse_tokterminator)
        ))
    )(input)?;
 
@@ -61,7 +63,10 @@ pub fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a 
 
 pub fn parse_float<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     combinator::map(
-        nom::number::complete::float,
+        sequence::terminated(
+            nom::number::complete::float,
+            combinator::peek(parse_tokterminator)
+        ),
         |val: f32| ScriptToken::Float(val)
     )(input)
 }
@@ -71,7 +76,7 @@ pub fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a
         parse_comment,
         parse_whitespace,
         parse_integer,
-        //###parse_float,
+        parse_float,
     ))(input)
 }
 
