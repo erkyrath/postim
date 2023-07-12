@@ -24,6 +24,7 @@ pub enum ScriptToken {
     Whitespace,
     Comment,
     Integer(i32),
+    BadToken(String),
 }
 
 pub fn parse_comment<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
@@ -46,8 +47,12 @@ pub fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a 
            many1(one_of("0123456789"))
        ),
        |val: &str| {
-           let ival = i32::from_str_radix(&val, 10).unwrap();
-           ScriptToken::Integer(ival)
+           if let Ok(ival) = i32::from_str_radix(&val, 10) {
+               ScriptToken::Integer(ival)
+           }
+           else {
+               ScriptToken::BadToken(val.to_string())
+           }
        }
     )(input)
 }
