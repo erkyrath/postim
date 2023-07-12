@@ -6,12 +6,12 @@ use crate::script::Script;
 use crate::script::parse::load_script;
 
 pub fn run(opts: &AppOptions) -> Result<(), Box<dyn Error>> {
-    let mut scripts: Vec<Script> = Vec::new();
+
+    let iter = opts.script.iter().map(|filename| load_script(&filename));
+    let res: Result<Vec<Script>, _> = iter.collect();
+    let scripts = res?;
     
-    for filename in &opts.script {
-    	let script = load_script(&filename)?;
-	scripts.push(script);
-    }
+    println!("### loaded {} scripts", scripts.len());
     
     Ok(())
 }
