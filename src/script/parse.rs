@@ -4,16 +4,12 @@ use nom::error::ParseError;
 use nom::error::VerboseError;
 use nom::error::ErrorKind;
 
+use nom::sequence;
+use nom::combinator;
+use nom::multi;
+use nom::branch;
+
 use nom::{
-    combinator::value,
-    combinator::opt,
-    combinator::recognize,
-    combinator::map,
-    combinator::eof,
-    sequence::pair,
-    sequence::terminated,
-    branch::alt,
-    multi::many0,
     bytes::complete::is_not,
     character::complete::char,
     character::complete::digit1,
@@ -29,23 +25,23 @@ pub enum ScriptToken {
 }
 
 pub fn parse_comment<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
-    value(
+    combinator::value(
         ScriptToken::Comment,
-        pair(char('#'), is_not("\n\r"))
+        sequence::pair(char('#'), is_not("\n\r"))
     )(input)
 }
 
 pub fn parse_whitespace<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
-    value(
+    combinator::value(
         ScriptToken::Whitespace,
         multispace1
     )(input)
 }
 
 pub fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
-   let (pinput, pstr) = recognize(
-       pair(
-           opt(char('-')),
+   let (pinput, pstr) = combinator::recognize(
+       sequence::pair(
+           combinator::opt(char('-')),
            digit1
        )
    )(input)?;
@@ -58,14 +54,14 @@ pub fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a 
 }
 
 pub fn parse_float<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
-    map(
+    combinator::map(
         nom::number::complete::float,
         |val: f32| ScriptToken::Float(val)
     )(input)
 }
 
 pub fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
-    alt((
+    branch::alt((
         parse_comment,
         parse_whitespace,
         parse_integer,
@@ -74,9 +70,9 @@ pub fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a
 }
 
 pub fn parse_anytokenlist<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, Vec<ScriptToken>, E> {
-    terminated(
-        many0(parse_anytoken),
-        eof
+    sequence::terminated(
+        multi::many0(parse_anytoken),
+        combinator::eof
     )(input)
 }
 
