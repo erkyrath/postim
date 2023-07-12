@@ -47,15 +47,16 @@ pub fn parse_tokterminator<'a, E: ParseError<&'a str>>(input: &'a str) -> IResul
 }
 
 pub fn parse_name<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
-   let (pinput, pstr) = combinator::recognize(
-       sequence::tuple((
-           character::complete::alpha1,
-           character::complete::alphanumeric0,
-           combinator::peek(parse_tokterminator)
-       ))
-   )(input)?;
-
-   return Ok( (pinput, ScriptToken::Name(pstr.to_string())) );
+    combinator::map(
+        combinator::recognize(
+            sequence::tuple((
+                character::complete::alpha1,
+                character::complete::alphanumeric0,
+                combinator::peek(parse_tokterminator)
+            ))
+        ),
+        |val| ScriptToken::Name(val.to_string())
+    )(input)
 }
 
 pub fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
