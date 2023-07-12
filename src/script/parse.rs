@@ -24,6 +24,7 @@ pub enum ScriptToken {
     Whitespace,
     Comment,
     Integer(i32),
+    Float(f32),
     BadToken(String),
 }
 
@@ -60,11 +61,19 @@ pub fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a 
     )(input)
 }
 
+pub fn parse_float<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
+    map(
+        nom::number::complete::float,
+        |val: f32| ScriptToken::Float(val)
+    )(input)
+}
+
 pub fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     alt((
         parse_comment,
         parse_whitespace,
         parse_integer,
+        parse_float,
     ))(input)
 }
 
