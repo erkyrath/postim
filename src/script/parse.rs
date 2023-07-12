@@ -16,9 +16,12 @@ use nom::character;
 pub enum ScriptToken {
     Whitespace,
     Comment,
+    Name(String),
     Integer(i32),
     Float(f32),
-    Name(String),
+    Size(i32, i32),
+    Color(u8, u8, u8),
+    OpArrow,
 }
 
 pub fn parse_comment<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
@@ -85,6 +88,35 @@ pub fn parse_float<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a st
     )(input)
 }
 
+pub fn parse_size<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
+   let (pinput, (pstr1, pstr2)) =
+   sequence::separated_pair(
+       combinator::recognize(
+           sequence::pair(
+               combinator::opt(character::complete::char('-')),
+               character::complete::digit1,
+           )
+       ),
+       character::complete::char('x'),
+       combinator::recognize(
+           sequence::pair(
+               combinator::opt(character::complete::char('-')),
+               character::complete::digit1,
+           )
+       )
+   )(input)?;
+
+   let ival1 = i32::from_str_radix(pstr1, 10).
+       map_err(|_err| {
+           Err::Failure(E::from_error_kind(pinput, ErrorKind::Fail))
+       })?;
+   let ival2 = i32::from_str_radix(pstr2, 10).
+       map_err(|_err| {
+           Err::Failure(E::from_error_kind(pinput, ErrorKind::Fail))
+       })?;
+   return Ok( (pinput, ScriptToken::Size(ival1, ival2)) );
+}
+
 pub fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     branch::alt((
         parse_comment,
@@ -92,6 +124,7 @@ pub fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a
         parse_name,
         parse_integer,
         parse_float,
+        parse_size,
     ))(input)
 }
 
