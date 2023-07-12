@@ -89,33 +89,50 @@ pub fn parse_float<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a st
 }
 
 pub fn parse_size<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
-   let (pinput, (pstr1, pstr2)) =
-   sequence::separated_pair(
-       combinator::recognize(
-           sequence::tuple((
-               combinator::opt(character::complete::char('-')),
-               character::complete::digit1,
-           ))
-       ),
-       character::complete::char('x'),
-       combinator::recognize(
-           sequence::tuple((
-               combinator::opt(character::complete::char('-')),
-               character::complete::digit1,
-               combinator::peek(parse_tokterminator)
-           ))
-       )
-   )(input)?;
+    let (pinput, (pstr1, pstr2)) =
+    sequence::separated_pair(
+        combinator::recognize(
+            sequence::tuple((
+                combinator::opt(character::complete::char('-')),
+                character::complete::digit1,
+            ))
+        ),
+        character::complete::char('x'),
+        combinator::recognize(
+            sequence::tuple((
+                combinator::opt(character::complete::char('-')),
+                character::complete::digit1,
+                combinator::peek(parse_tokterminator)
+            ))
+        )
+    )(input)?;
+ 
+    let ival1 = i32::from_str_radix(pstr1, 10).
+        map_err(|_err| {
+            Err::Failure(E::from_error_kind(pinput, ErrorKind::Fail))
+        })?;
+    let ival2 = i32::from_str_radix(pstr2, 10).
+        map_err(|_err| {
+            Err::Failure(E::from_error_kind(pinput, ErrorKind::Fail))
+        })?;
+    return Ok( (pinput, ScriptToken::Size(ival1, ival2)) );
+}
 
-   let ival1 = i32::from_str_radix(pstr1, 10).
-       map_err(|_err| {
-           Err::Failure(E::from_error_kind(pinput, ErrorKind::Fail))
-       })?;
-   let ival2 = i32::from_str_radix(pstr2, 10).
-       map_err(|_err| {
-           Err::Failure(E::from_error_kind(pinput, ErrorKind::Fail))
-       })?;
-   return Ok( (pinput, ScriptToken::Size(ival1, ival2)) );
+pub fn parse_color<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
+    let (pinput, pstr) = combinator::recognize(
+        sequence::tuple((
+            character::complete::char('$'),
+            character::complete::hex_digit1,
+            combinator::peek(parse_tokterminator)
+        ))
+    )(input)?;
+ 
+    
+    let ival = i32::from_str_radix(pstr, 10).
+        map_err(|_err| {
+            Err::Failure(E::from_error_kind(pinput, ErrorKind::Fail))
+        })?;
+    return Ok( (pinput, ScriptToken::Integer(ival)) );
 }
 
 pub fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
@@ -126,6 +143,7 @@ pub fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a
         parse_integer,
         parse_float,
         parse_size,
+        parse_color,
     ))(input)
 }
 
