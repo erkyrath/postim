@@ -42,6 +42,12 @@ impl ExecContext {
                 ScriptToken::Float(val) => {
                     self.push(StackValue::Float(*val));
                 },
+                ScriptToken::String(val) => {
+                    self.push(StackValue::String(val.clone()));
+                },
+                ScriptToken::Size(valx, valy) => {
+                    self.push(StackValue::Size(*valx, *valy));
+                },
                 other => {
                     let msg = format!("Unknown token: {:?}", other);
                     return Err(ExecError::new(&msg))
