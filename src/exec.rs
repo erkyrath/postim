@@ -50,7 +50,12 @@ impl ExecContext {
                     self.push(StackValue::Size(*valx, *valy));
                 },
                 ScriptToken::Name(val) => {
-                    self.execute_builtin(val)?;
+                    if let Some(heapval) = self.heap.get(val) {
+                        self.push(heapval.clone());
+                    }
+                    else {
+                        self.execute_builtin(val)?;
+                    }
                 },
                 other => {
                     let msg = format!("unknown token: {:?}", other);
