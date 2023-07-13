@@ -185,6 +185,22 @@ impl ExecContext {
                 let res = img.tile_by(uwidth, uheight);
                 self.push_img(res);
             },
+
+            "diamond" => {
+                // SIZE diamond, etc
+                let (width, height) = self.pop_as_size(tok)?;
+                let (uwidth, uheight) = (width as usize, height as usize);
+                let res : Img<f32> = Img::diamond(uwidth, uheight);
+                self.push_img(res);
+            },
+
+            "holify" => {
+                // IMG NUM holify
+                let val = self.pop_as_float(tok)?;
+                let img: Rc<Img<f32>> = self.pop_img(tok)?;
+                let res = img.holify(val);
+                self.push_img(res);
+            },
             
             _ => {
                 let msg = format!("name not known: {:?}", tok);

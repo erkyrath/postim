@@ -124,4 +124,47 @@ impl Img<f32> {
         res
     }
 
+    pub fn diamond(width: usize, height: usize) -> Img<f32> {
+        let mut res = Img::new(width, height);
+        
+        for jx in 0..height {
+            let ydiff = ((jx as f32 / height as f32) - 0.5).abs() * 2.0;
+            for ix in 0..width {
+                let xdiff = ((ix as f32 / width as f32) - 0.5).abs() * 2.0;
+                let ddiff = ydiff - xdiff;
+                let val = if ddiff >= 1.0 || ddiff <= -1.0 {
+                    0.0
+                }
+                else {
+                    if ydiff > xdiff { xdiff / (1.0-ddiff) } else { ydiff / (1.0+ddiff) }
+                };
+                res.set(ix, jx, Pix::grey(val));
+            }
+        }
+        
+        res
+    }
+
+    pub fn holify(&self, rad: f32) -> Img<f32> {
+        let halfwidth = (self.width/2) as f32;
+        let halfheight = (self.height/2) as f32;
+        let res = self.project_shade(|xp, yp| {
+            let xpc = xp - halfwidth;
+            let ypc = yp - halfheight;
+            let mut dist = xpc.hypot(ypc);
+            let xvec = xpc / dist;
+            let yvec = ypc / dist;
+            if dist >= rad {
+                return (xp, yp, 0.0)
+            }
+            dist = 2.0 * (rad - dist) / rad;
+            let shade = dist * (xvec + yvec);
+            dist = rad - rad * dist.asin();
+            if dist.is_nan() {
+                return (dist, dist, 0.0)
+            }
+            ((xvec * dist) + halfwidth, (yvec * dist) + halfheight, shade * 0.5)
+        });
+        res
+    }
 }
