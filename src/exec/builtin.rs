@@ -162,6 +162,23 @@ impl ExecContext {
                 let res = img.contrast(val);
                 self.push_img(res);
             }
+
+            "tileby" => {
+                // IMG SIZE tileby, IMG NUM NUM tileby
+                let (width, height) = self.pop_as_size(tok)?;
+                let img: Rc<Img<f32>> = self.pop_img(tok)?;
+                if width <= 0 || height <= 0 {
+                    let msg = format!("tileby size must be positive: {width}x{height}");
+                    return Err(ExecError::new(&msg));
+                }
+                let (uwidth, uheight) = (width as usize, height as usize);
+                if img.width * uwidth >= 0x10000 || img.height * uheight > 0x10000 {
+                    let msg = format!("tileby size is too large: {width}x{height}");
+                    return Err(ExecError::new(&msg));
+                }
+                let res = img.tile_by(uwidth, uheight);
+                self.push_img(res);
+            }
             
             _ => {
                 let msg = format!("name not known: {:?}", tok);
