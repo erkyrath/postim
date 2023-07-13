@@ -25,7 +25,11 @@ impl ExecContext {
                         self.push_int(xval);
                         self.push_int(yval);
                     }
-                    //### color
+                    StackValue::Color(pix) => {
+                        self.push_float(pix.r);
+                        self.push_float(pix.g);
+                        self.push_float(pix.b);
+                    }
                     _ => {
                         let msg = format!("cannot split: {:?}", stackval);
                         return Err(ExecError::new(&msg));

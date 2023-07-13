@@ -4,6 +4,8 @@ use crate::exec::except::ExecError;
 
 use std::collections::HashMap;
 
+use crate::pixel::Pix;
+
 pub mod except;
 pub mod builtin;
 
@@ -13,6 +15,7 @@ pub enum StackValue {
     Integer(i32),
     Float(f32),
     Size(i32, i32),
+    Color(Pix<f32>),
 }
 
 pub struct ExecContext {
@@ -40,6 +43,10 @@ impl ExecContext {
         self.stack.push(StackValue::Integer(val));
     }
 
+    pub fn push_float(&mut self, val: f32) {
+        self.stack.push(StackValue::Float(val));
+    }
+
     pub fn execute(&mut self, script: &Script) -> Result<(), ExecError> {
         println!("### running {:?}", script);
 
@@ -56,6 +63,10 @@ impl ExecContext {
                 },
                 ScriptToken::Size(valx, valy) => {
                     self.push(StackValue::Size(*valx, *valy));
+                },
+                ScriptToken::Color(valr, valg, valb) => {
+                    let pix: Pix<f32> = Pix::new(*valr as f32, *valg as f32, *valb as f32);
+                    self.push(StackValue::Color(pix));
                 },
                 ScriptToken::Name(val) => {
                     if let Some(heapval) = self.heap.get(val) {

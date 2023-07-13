@@ -5,6 +5,7 @@ use gumdrop::Options;
 mod run;
 mod script;
 mod exec;
+mod pixel;
 
 #[derive(Options, Debug)]
 pub struct AppOptions {
