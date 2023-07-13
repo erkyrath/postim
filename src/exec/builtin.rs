@@ -4,11 +4,18 @@ use crate::exec::except::ExecError;
 impl ExecContext {
     pub fn execute_builtin(&mut self, tok: &str) -> Result<(), ExecError> {
         match tok {
+        
             "dup" => {
                 let stackval = self.stack.last()
                     .ok_or_else(|| ExecError::new("stack underflow") )?;
                 self.push(stackval.clone());
             },
+            
+            "pop" => {
+                let _ = self.stack.pop()
+                    .ok_or_else(|| ExecError::new("stack underflow") )?;
+            },
+            
             _ => {
                 let msg = format!("name not known: {:?}", tok);
                 return Err(ExecError::new(&msg));
