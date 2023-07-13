@@ -5,6 +5,7 @@ use crate::exec::except::ExecError;
 use std::collections::HashMap;
 
 use crate::pixel::Pix;
+use crate::img::Img;
 
 pub mod except;
 pub mod builtin;
@@ -16,6 +17,7 @@ pub enum StackValue {
     Float(f32),
     Size(i32, i32),
     Color(Pix<f32>),
+    Image(Img<f32>),
 }
 
 pub struct ExecContext {
