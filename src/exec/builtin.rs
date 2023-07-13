@@ -19,6 +19,13 @@ impl ExecContext {
                 let _ = self.pop("pop")?;
             },
 
+            "swap" => {
+                let val1 = self.pop("swap")?;
+                let val2 = self.pop("swap")?;
+                self.push(val1);
+                self.push(val2);
+            },
+
             "split" => {
                 // COLOR split, SIZE split
                 let stackval = self.pop("split")?;
@@ -69,13 +76,13 @@ impl ExecContext {
                         (width, height) = (wval, hval);
                     },
                     StackValue::Integer(ival) => {
-                        width = ival;
-                        let heightval = self.pop("image")?;
-                        if let StackValue::Integer(jval) = heightval {
-                            height = jval;
+                        height = ival;
+                        let widthval = self.pop("image")?;
+                        if let StackValue::Integer(jval) = widthval {
+                            width = jval;
                         }
                         else {
-                            let msg = format!("image needs size or int int: {:?}", heightval);
+                            let msg = format!("image needs size or int int: {:?}", widthval);
                             return Err(ExecError::new(&msg));
                         }
                     }
