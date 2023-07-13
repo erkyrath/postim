@@ -148,6 +148,13 @@ impl ExecContext {
                 self.push_img(inimg.as_f32());
             },
 
+            "average" => {
+                // IMG contrast
+                let img: Rc<Img<f32>> = self.pop_img(tok)?;
+                let pix = img.average();
+                self.push_color(pix);
+            }
+            
             "contrast" => {
                 // IMG NUM contrast
                 let val = self.pop_as_float(tok)?;

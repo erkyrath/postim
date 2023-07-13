@@ -128,6 +128,10 @@ impl ExecContext {
         self.stack.push(StackValue::Size(width, height));
     }
 
+    pub fn push_color(&mut self, val: Pix<f32>) {
+        self.stack.push(StackValue::Color(val));
+    }
+
     pub fn push_img(&mut self, val: Img<f32>) {
         self.stack.push(StackValue::Image(Rc::new(val)));
     }
