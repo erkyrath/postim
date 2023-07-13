@@ -16,12 +16,12 @@ impl ExecContext {
             },
             
             "pop" => {
-                let _ = self.pop()?;
+                let _ = self.pop("pop")?;
             },
 
             "split" => {
                 // COLOR split, SIZE split
-                let stackval = self.pop()?;
+                let stackval = self.pop("split")?;
                 match stackval {
                     StackValue::Size(xval, yval) => {
                         self.push_int(xval);
@@ -45,7 +45,7 @@ impl ExecContext {
                 let color: Pix<f32>;
                 let size: (i32, i32);
                 
-                let colorval = self.pop()?;
+                let colorval = self.pop("image")?;
                 match colorval {
                     StackValue::Color(pix) => {
                         color = pix;
@@ -62,7 +62,7 @@ impl ExecContext {
                     }
                 }
 
-                let sizeval = self.pop()?;
+                let sizeval = self.pop("image")?;
                 match sizeval {
                     StackValue::Size(wval, hval) => {
                         size = (wval, hval);

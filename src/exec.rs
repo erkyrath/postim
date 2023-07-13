@@ -38,9 +38,12 @@ impl ExecContext {
         &self.stack
     }
 
-    pub fn pop(&mut self) -> Result<StackValue, ExecError> {
+    pub fn pop(&mut self, label: &str) -> Result<StackValue, ExecError> {
         let val = self.stack.pop()
-            .ok_or_else(|| ExecError::new("stack underflow") )?;
+            .ok_or_else(|| {
+                let msg = format!("stack underflow in {}", label);
+                ExecError::new(&msg)
+            })?;
         Ok(val)
     }
 
