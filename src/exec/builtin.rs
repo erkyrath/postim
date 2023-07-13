@@ -136,19 +136,8 @@ impl ExecContext {
 
             "write" => {
                 // IMG STR write
-                let img: Rc<Img<f32>>;
-                
                 let name: String = self.pop_str("write")?;
-                
-                let imgval = self.pop("write")?;
-                if let StackValue::Image(iref) = imgval {
-                    img = iref;
-                }
-                else {
-                    let msg = format!("write needs image: {:?}", imgval);
-                    return Err(ExecError::new(&msg));
-                }
-
+                let img: Rc<Img<f32>> = self.pop_img("write")?;
                 ppmio::img_write(&name, img.as_u8())?;
             },
             

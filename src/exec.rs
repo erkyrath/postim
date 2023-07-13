@@ -71,6 +71,18 @@ impl ExecContext {
         }
     }
 
+    pub fn pop_img(&mut self, label: &str) -> Result<Rc<Img<f32>>, ExecError> {
+        let val = self.pop(label)?;
+        
+        if let StackValue::Image(imgval) = val {
+            Ok(imgval)
+        }
+        else {
+            let msg = format!("{} needs image: {:?}", label, val);
+            Err(ExecError::new(&msg))
+        }
+    }
+
     pub fn push(&mut self, val: StackValue) {
         self.stack.push(val);
     }
