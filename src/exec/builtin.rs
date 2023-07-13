@@ -18,19 +18,19 @@ impl ExecContext {
             },
             
             "pop" => {
-                let _ = self.pop("pop")?;
+                let _ = self.pop(tok)?;
             },
 
             "swap" => {
-                let val1 = self.pop("swap")?;
-                let val2 = self.pop("swap")?;
+                let val1 = self.pop(tok)?;
+                let val2 = self.pop(tok)?;
                 self.push(val1);
                 self.push(val2);
             },
 
             "split" => {
                 // COLOR split, SIZE split
-                let stackval = self.pop("split")?;
+                let stackval = self.pop(tok)?;
                 match stackval {
                     StackValue::Size(xval, yval) => {
                         self.push_int(xval);
@@ -52,7 +52,7 @@ impl ExecContext {
                 // INT INT size, IMAGE size, SIZE size
                 let width: i32;
                 let height: i32;
-                let sizeval = self.pop("size")?;
+                let sizeval = self.pop(tok)?;
                 match sizeval {
                     StackValue::Size(wval, hval) => {
                         (width, height) = (wval, hval);
@@ -62,7 +62,7 @@ impl ExecContext {
                     },
                     StackValue::Integer(ival) => {
                         height = ival;
-                        let widthval = self.pop("image")?;
+                        let widthval = self.pop(tok)?;
                         if let StackValue::Integer(jval) = widthval {
                             width = jval;
                         }
@@ -86,7 +86,7 @@ impl ExecContext {
                 let width: i32;
                 let height: i32;
                 
-                let colorval = self.pop("image")?;
+                let colorval = self.pop(tok)?;
                 match colorval {
                     StackValue::Color(pix) => {
                         color = pix;
@@ -103,14 +103,14 @@ impl ExecContext {
                     }
                 }
 
-                let sizeval = self.pop("image")?;
+                let sizeval = self.pop(tok)?;
                 match sizeval {
                     StackValue::Size(wval, hval) => {
                         (width, height) = (wval, hval);
                     },
                     StackValue::Integer(ival) => {
                         height = ival;
-                        let widthval = self.pop("image")?;
+                        let widthval = self.pop(tok)?;
                         if let StackValue::Integer(jval) = widthval {
                             width = jval;
                         }
@@ -136,22 +136,22 @@ impl ExecContext {
 
             "write" => {
                 // IMG STR write
-                let name: String = self.pop_str("write")?;
-                let img: Rc<Img<f32>> = self.pop_img("write")?;
+                let name: String = self.pop_str(tok)?;
+                let img: Rc<Img<f32>> = self.pop_img(tok)?;
                 ppmio::img_write(&name, img.as_u8())?;
             },
             
             "read" => {
                 // STR read
-                let name: String = self.pop_str("read")?;
+                let name: String = self.pop_str(tok)?;
                 let inimg = ppmio::img_read(&name)?;
                 self.push_img(inimg.as_f32());
             },
 
             "contrast" => {
                 // IMG NUM contrast
-                let val = self.pop_as_float("contrast")?;
-                let img: Rc<Img<f32>> = self.pop_img("contrast")?;
+                let val = self.pop_as_float(tok)?;
+                let img: Rc<Img<f32>> = self.pop_img(tok)?;
                 let res = img.contrast(val);
                 self.push_img(res);
             }
