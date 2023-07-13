@@ -59,6 +59,10 @@ impl ExecContext {
         self.stack.push(StackValue::Float(val));
     }
 
+    pub fn push_size(&mut self, width: i32, height: i32) {
+        self.stack.push(StackValue::Size(width, height));
+    }
+
     pub fn push_img(&mut self, val: Img<f32>) {
         self.stack.push(StackValue::Image(Rc::new(val)));
     }

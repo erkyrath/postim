@@ -3,6 +3,7 @@ use std::fmt;
 use crate::pixel::Pix;
 
 pub mod imgmath;
+pub mod ppmio;
 
 pub struct Img<T> {
     pub width: usize,

@@ -46,6 +46,37 @@ impl ExecContext {
                 }
             },
 
+            "size" => {
+                // INT INT size, IMAGE size, SIZE size
+                let width: i32;
+                let height: i32;
+                let sizeval = self.pop("size")?;
+                match sizeval {
+                    StackValue::Size(wval, hval) => {
+                        (width, height) = (wval, hval);
+                    },
+                    StackValue::Image(img) => {
+                        (width, height) = (img.width as i32, img.height as i32);
+                    },
+                    StackValue::Integer(ival) => {
+                        height = ival;
+                        let widthval = self.pop("image")?;
+                        if let StackValue::Integer(jval) = widthval {
+                            width = jval;
+                        }
+                        else {
+                            let msg = format!("size needs image or int int: {:?}", widthval);
+                            return Err(ExecError::new(&msg));
+                        }
+                    }
+                    _ => {
+                        let msg = format!("image needs image or int int: {:?}", sizeval);
+                        return Err(ExecError::new(&msg));
+                    }
+                }
+                self.push_size(width, height);
+            },
+
             "image" => {
                 // SIZE COLOR image, INT INT COLOR image
                 // SIZE NUM image, INT INT NUM image
