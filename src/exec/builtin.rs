@@ -136,17 +136,9 @@ impl ExecContext {
 
             "write" => {
                 // IMG STR write
-                let name: String;
                 let img: Rc<Img<f32>>;
                 
-                let nameval = self.pop("write")?;
-                if let StackValue::String(strval) = nameval {
-                    name = strval;
-                }
-                else {
-                    let msg = format!("write needs str: {:?}", nameval);
-                    return Err(ExecError::new(&msg));
-                }
+                let name: String = self.pop_str("write")?;
                 
                 let imgval = self.pop("write")?;
                 if let StackValue::Image(iref) = imgval {
@@ -162,17 +154,7 @@ impl ExecContext {
             
             "read" => {
                 // STR read
-                let name: String;
-                
-                let nameval = self.pop("read")?;
-                if let StackValue::String(strval) = nameval {
-                    name = strval;
-                }
-                else {
-                    let msg = format!("read needs str: {:?}", nameval);
-                    return Err(ExecError::new(&msg));
-                }
-
+                let name: String = self.pop_str("read")?;
                 let inimg = ppmio::img_read(&name)?;
                 self.push_img(inimg.as_f32());
             },

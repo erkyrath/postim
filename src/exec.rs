@@ -47,6 +47,18 @@ impl ExecContext {
         Ok(val)
     }
 
+    pub fn pop_str(&mut self, label: &str) -> Result<String, ExecError> {
+        let val = self.pop(label)?;
+        
+        if let StackValue::String(strval) = val {
+            Ok(strval)
+        }
+        else {
+            let msg = format!("{} needs str: {:?}", label, val);
+            Err(ExecError::new(&msg))
+        }
+    }
+
     pub fn push(&mut self, val: StackValue) {
         self.stack.push(val);
     }
