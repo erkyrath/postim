@@ -107,4 +107,21 @@ impl Img<f32> {
             b:(pix.b-avpix.b) * val + avpix.b,
         })
     }
+    
+    pub fn halfshift(&self) -> Img<f32> {
+        let mut res: Img<f32> = Img::new(self.width, self.height);
+        
+        let halfwidth = self.width/2;
+        let halfheight = self.height/2;
+        
+        for jx in 0..self.height {
+            for ix in 0..self.width {
+                let pix = self.at((ix+halfwidth) % self.width, (jx+halfheight) % self.height);
+                res.set(ix, jx, pix.clone());
+            }
+        }
+        
+        res
+    }
+
 }

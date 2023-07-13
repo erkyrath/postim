@@ -153,7 +153,7 @@ impl ExecContext {
                 let img: Rc<Img<f32>> = self.pop_img(tok)?;
                 let pix = img.average();
                 self.push_color(pix);
-            }
+            },
             
             "contrast" => {
                 // IMG NUM contrast
@@ -161,7 +161,13 @@ impl ExecContext {
                 let img: Rc<Img<f32>> = self.pop_img(tok)?;
                 let res = img.contrast(val);
                 self.push_img(res);
-            }
+            },
+
+            "halfshift" => {
+                let img: Rc<Img<f32>> = self.pop_img(tok)?;
+                let res = img.halfshift();
+                self.push_img(res);
+            },
 
             "tileby" => {
                 // IMG SIZE tileby, IMG NUM NUM tileby
@@ -178,7 +184,7 @@ impl ExecContext {
                 }
                 let res = img.tile_by(uwidth, uheight);
                 self.push_img(res);
-            }
+            },
             
             _ => {
                 let msg = format!("name not known: {:?}", tok);
