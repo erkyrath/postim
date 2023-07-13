@@ -85,7 +85,6 @@ impl ExecContext {
                     }
                 }
                 
-                println!("### {width}x{height} {:?}", color);
                 if width <= 0 || height <= 0 {
                     let msg = format!("image size must be positive: {width}x{height}");
                     return Err(ExecError::new(&msg));
