@@ -54,18 +54,6 @@ impl<T: Default + Clone> Img<T> {
 
 }
 
-impl<T: Clone> Clone for Img<T> {
-    fn clone(&self) -> Img<T> {
-        let res = Img {
-            width: self.width,
-            height: self.height,
-            pixels: self.pixels.clone(),
-        };
-        
-        res
-    }
-}
-
 impl<T: Clone> Img<T> {
     pub fn new_constant(width: usize, height: usize, pix: Pix<T>) -> Img<T> {
         let res = Img {

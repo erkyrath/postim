@@ -3,6 +3,7 @@ use crate::script::ScriptToken;
 use crate::exec::except::ExecError;
 
 use std::collections::HashMap;
+use std::rc::Rc;
 
 use crate::pixel::Pix;
 use crate::img::Img;
@@ -17,7 +18,7 @@ pub enum StackValue {
     Float(f32),
     Size(i32, i32),
     Color(Pix<f32>),
-    Image(Img<f32>),
+    Image(Rc<Img<f32>>),
 }
 
 pub struct ExecContext {
