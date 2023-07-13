@@ -160,6 +160,23 @@ impl ExecContext {
                 ppmio::img_write(&name, img.as_u8())?;
             },
             
+            "read" => {
+                // STR read
+                let name: String;
+                
+                let nameval = self.pop("read")?;
+                if let StackValue::String(strval) = nameval {
+                    name = strval;
+                }
+                else {
+                    let msg = format!("read needs str: {:?}", nameval);
+                    return Err(ExecError::new(&msg));
+                }
+
+                let inimg = ppmio::img_read(&name)?;
+                self.push_img(inimg.as_f32());
+            },
+            
             _ => {
                 let msg = format!("name not known: {:?}", tok);
                 return Err(ExecError::new(&msg));
