@@ -16,14 +16,12 @@ impl ExecContext {
             },
             
             "pop" => {
-                let _ = self.stack.pop()
-                    .ok_or_else(|| ExecError::new("stack underflow") )?;
+                let _ = self.pop()?;
             },
 
             "split" => {
                 // COLOR split, SIZE split
-                let stackval = self.stack.pop()
-                    .ok_or_else(|| ExecError::new("stack underflow") )?;
+                let stackval = self.pop()?;
                 match stackval {
                     StackValue::Size(xval, yval) => {
                         self.push_int(xval);
@@ -47,8 +45,7 @@ impl ExecContext {
                 let color: Pix<f32>;
                 let size: (i32, i32);
                 
-                let colorval = self.stack.pop()
-                    .ok_or_else(|| ExecError::new("stack underflow") )?;
+                let colorval = self.pop()?;
                 match colorval {
                     StackValue::Color(pix) => {
                         color = pix;
@@ -65,8 +62,7 @@ impl ExecContext {
                     }
                 }
 
-                let sizeval = self.stack.pop()
-                    .ok_or_else(|| ExecError::new("stack underflow") )?;
+                let sizeval = self.pop()?;
                 match sizeval {
                     StackValue::Size(wval, hval) => {
                         size = (wval, hval);

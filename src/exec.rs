@@ -38,6 +38,12 @@ impl ExecContext {
         &self.stack
     }
 
+    pub fn pop(&mut self) -> Result<StackValue, ExecError> {
+        let val = self.stack.pop()
+            .ok_or_else(|| ExecError::new("stack underflow") )?;
+        Ok(val)
+    }
+
     pub fn push(&mut self, val: StackValue) {
         self.stack.push(val);
     }
