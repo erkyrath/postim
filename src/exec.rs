@@ -28,6 +28,10 @@ impl ExecContext {
         }
     }
 
+    pub fn stack(&self) -> &[StackValue] {
+        &self.stack
+    }
+
     pub fn push(&mut self, val: StackValue) {
         self.stack.push(val);
     }

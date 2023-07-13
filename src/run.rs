@@ -18,6 +18,8 @@ pub fn run(opts: &AppOptions) -> Result<(), Box<dyn Error>> {
     for script in &scripts {
         ctx.execute(&script)?;
     }
+
+    println!("stack: {:?}", &ctx.stack());
     
     Ok(())
 }
