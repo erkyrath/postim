@@ -43,7 +43,8 @@ impl ExecContext {
                 // SIZE COLOR image, INT INT COLOR image
                 // SIZE NUM image, INT INT NUM image
                 let color: Pix<f32>;
-                let size: (i32, i32);
+                let width: i32;
+                let height: i32;
                 
                 let colorval = self.pop("image")?;
                 match colorval {
@@ -65,7 +66,7 @@ impl ExecContext {
                 let sizeval = self.pop("image")?;
                 match sizeval {
                     StackValue::Size(wval, hval) => {
-                        size = (wval, hval);
+                        (width, height) = (wval, hval);
                     },
                     _ => {
                         let msg = format!("image needs size or int int: {:?}", sizeval);
@@ -73,8 +74,13 @@ impl ExecContext {
                     }
                 }
                 
-                println!("### {:?} {:?}", size, color);
-                let img = Img::new_constant(size.0 as usize, size.1 as usize, color);
+                println!("### {width}x{height} {:?}", color);
+                if width <= 0 || height <= 0 {
+                    let msg = format!("image size must be positive: {width}x{height}");
+                    return Err(ExecError::new(&msg));
+                }
+                
+                let img = Img::new_constant(width as usize, height as usize, color);
                 self.push_img(img);
             },
             
