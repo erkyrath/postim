@@ -59,6 +59,10 @@ impl ExecContext {
         self.stack.push(StackValue::Float(val));
     }
 
+    pub fn push_img(&mut self, val: Img<f32>) {
+        self.stack.push(StackValue::Image(Rc::new(val)));
+    }
+
     pub fn execute(&mut self, script: &Script) -> Result<(), ExecError> {
         println!("### running {:?}", script);
 

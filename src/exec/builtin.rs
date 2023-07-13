@@ -68,12 +68,14 @@ impl ExecContext {
                         size = (wval, hval);
                     },
                     _ => {
-                        let msg = format!("image needs size or num num: {:?}", sizeval);
+                        let msg = format!("image needs size or int int: {:?}", sizeval);
                         return Err(ExecError::new(&msg));
                     }
                 }
                 
                 println!("### {:?} {:?}", size, color);
+                let img = Img::new_constant(size.0 as usize, size.1 as usize, color);
+                self.push_img(img);
             },
             
             _ => {
