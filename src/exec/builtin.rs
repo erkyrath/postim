@@ -1,3 +1,4 @@
+use crate::exec::StackValue;
 use crate::exec::ExecContext;
 use crate::exec::except::ExecError;
 
@@ -14,6 +15,22 @@ impl ExecContext {
             "pop" => {
                 let _ = self.stack.pop()
                     .ok_or_else(|| ExecError::new("stack underflow") )?;
+            },
+
+            "split" => {
+                let stackval = self.stack.pop()
+                    .ok_or_else(|| ExecError::new("stack underflow") )?;
+                match stackval {
+                    StackValue::Size(xval, yval) => {
+                        self.push_int(xval);
+                        self.push_int(yval);
+                    }
+                    //### color
+                    _ => {
+                        let msg = format!("cannot split: {:?}", stackval);
+                        return Err(ExecError::new(&msg));
+                    }
+                }
             },
             
             _ => {

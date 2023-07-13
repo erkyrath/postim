@@ -36,6 +36,10 @@ impl ExecContext {
         self.stack.push(val);
     }
 
+    pub fn push_int(&mut self, val: i32) {
+        self.stack.push(StackValue::Integer(val));
+    }
+
     pub fn execute(&mut self, script: &Script) -> Result<(), ExecError> {
         println!("### running {:?}", script);
 
