@@ -1,6 +1,8 @@
 use std::fmt;
 use std::error::Error;
 
+use crate::img::ppmio;
+
 #[derive(Debug)]
 pub struct ExecError {
     details: String,
@@ -21,6 +23,13 @@ impl fmt::Display for ExecError {
 impl Error for ExecError {
     fn description(&self) -> &str {
         &self.details
+    }
+}
+
+
+impl From<ppmio::PPMError> for ExecError {
+    fn from(err: ppmio::PPMError) -> ExecError {
+        return ExecError::new(&err.to_string());
     }
 }
 

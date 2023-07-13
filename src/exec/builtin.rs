@@ -1,9 +1,11 @@
-use crate::exec::StackValue;
-use crate::exec::ExecContext;
-use crate::exec::except::ExecError;
+use std::rc::Rc;
 
 use crate::pixel::Pix;
 use crate::img::Img;
+use crate::img::ppmio;
+use crate::exec::StackValue;
+use crate::exec::ExecContext;
+use crate::exec::except::ExecError;
 
 impl ExecContext {
     pub fn execute_builtin(&mut self, tok: &str) -> Result<(), ExecError> {
@@ -130,6 +132,32 @@ impl ExecContext {
                 
                 let img = Img::new_constant(width as usize, height as usize, color);
                 self.push_img(img);
+            },
+
+            "write" => {
+                // IMG STR write
+                let name: String;
+                let img: Rc<Img<f32>>;
+                
+                let nameval = self.pop("write")?;
+                if let StackValue::String(strval) = nameval {
+                    name = strval;
+                }
+                else {
+                    let msg = format!("write needs str: {:?}", nameval);
+                    return Err(ExecError::new(&msg));
+                }
+                
+                let imgval = self.pop("write")?;
+                if let StackValue::Image(iref) = imgval {
+                    img = iref;
+                }
+                else {
+                    let msg = format!("write needs image: {:?}", imgval);
+                    return Err(ExecError::new(&msg));
+                }
+
+                ppmio::img_write(&name, img.as_u8())?;
             },
             
             _ => {
