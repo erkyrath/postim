@@ -167,4 +167,50 @@ impl Img<f32> {
         });
         res
     }
+
+    pub fn taxiblur(&self, rad: i32) -> Img<f32> {
+        let mut res = Img::new(self.width, self.height);
+        
+        for jx in 0..self.height {
+            for ix in 0..self.width {
+                let mut totalweight = 0;
+                let mut total: Pix<f32> = Pix::default();
+                
+                for jdiff in -rad..rad {
+                    if (jx as i32)+jdiff < 0 || (jx as i32)+jdiff >= self.height as i32 {
+                        continue;
+                    }
+                    let jx2 = ((jx as i32) + jdiff) as usize;
+                    for idiff in -rad..rad {
+                        if (ix as i32)+idiff < 0 || (ix as i32)+idiff >= self.width as i32 {
+                            continue;
+                        }
+                        let ix2 = ((ix as i32) + idiff) as usize;
+                        
+                        let weight = rad - (idiff.abs()+jdiff.abs());
+                        if weight <= 0 {
+                            continue;
+                        }
+                        
+                        let pix = self.at(ix2, jx2);
+                        totalweight += weight;
+                        total.r += pix.r * (weight as f32);
+                        total.g += pix.g * (weight as f32);
+                        total.b += pix.b * (weight as f32);
+                    }
+                }
+                
+                if totalweight > 0 {
+                    total.r /= totalweight as f32;
+                    total.g /= totalweight as f32;
+                    total.b /= totalweight as f32;
+                }
+                
+                res.set(ix, jx, total);
+            }
+        }
+        
+        res
+    }
+    
 }

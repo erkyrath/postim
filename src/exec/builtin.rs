@@ -202,6 +202,14 @@ impl ExecContext {
                 self.push_img(res);
             },
             
+            "taxiblur" => {
+                // IMG INT taxiblur
+                let val = self.pop_int(tok)?;
+                let img: Rc<Img<f32>> = self.pop_img(tok)?;
+                let res = img.taxiblur(val);
+                self.push_img(res);
+            },
+            
             _ => {
                 let msg = format!("name not known: {:?}", tok);
                 return Err(ExecError::new(&msg));
