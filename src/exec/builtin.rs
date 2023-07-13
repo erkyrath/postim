@@ -68,6 +68,17 @@ impl ExecContext {
                     StackValue::Size(wval, hval) => {
                         (width, height) = (wval, hval);
                     },
+                    StackValue::Integer(ival) => {
+                        width = ival;
+                        let heightval = self.pop("image")?;
+                        if let StackValue::Integer(jval) = heightval {
+                            height = jval;
+                        }
+                        else {
+                            let msg = format!("image needs size or int int: {:?}", heightval);
+                            return Err(ExecError::new(&msg));
+                        }
+                    }
                     _ => {
                         let msg = format!("image needs size or int int: {:?}", sizeval);
                         return Err(ExecError::new(&msg));
