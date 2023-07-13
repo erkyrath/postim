@@ -47,6 +47,18 @@ impl ExecContext {
         Ok(val)
     }
 
+    pub fn pop_int(&mut self, label: &str) -> Result<i32, ExecError> {
+        let val = self.pop(label)?;
+        
+        if let StackValue::Integer(ival) = val {
+            Ok(ival)
+        }
+        else {
+            let msg = format!("{} needs str: {:?}", label, val);
+            Err(ExecError::new(&msg))
+        }
+    }
+
     pub fn pop_str(&mut self, label: &str) -> Result<String, ExecError> {
         let val = self.pop(label)?;
         
@@ -69,6 +81,10 @@ impl ExecContext {
 
     pub fn push_float(&mut self, val: f32) {
         self.stack.push(StackValue::Float(val));
+    }
+
+    pub fn push_str(&mut self, val: String) {
+        self.stack.push(StackValue::String(val));
     }
 
     pub fn push_size(&mut self, width: i32, height: i32) {
