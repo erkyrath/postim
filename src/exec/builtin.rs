@@ -147,6 +147,14 @@ impl ExecContext {
                 let inimg = ppmio::img_read(&name)?;
                 self.push_img(inimg.as_f32());
             },
+
+            "contrast" => {
+                // IMG NUM contrast
+                let val = self.pop_as_float("contrast")?;
+                let img: Rc<Img<f32>> = self.pop_img("contrast")?;
+                let res = img.contrast(val);
+                self.push_img(res);
+            }
             
             _ => {
                 let msg = format!("name not known: {:?}", tok);
