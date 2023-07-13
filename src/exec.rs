@@ -62,7 +62,8 @@ impl ExecContext {
                     }
                 },
                 ScriptToken::StoreTo(val) => {
-                    let stackval = self.stack.pop().ok_or_else(|| ExecError::new("stack underflow") )?;
+                    let stackval = self.stack.pop()
+                        .ok_or_else(|| ExecError::new("stack underflow") )?;
                     self.heap.insert(val.to_string(), stackval);
                 }
                 other => {
