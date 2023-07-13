@@ -2,6 +2,9 @@ use crate::exec::StackValue;
 use crate::exec::ExecContext;
 use crate::exec::except::ExecError;
 
+use crate::pixel::Pix;
+use crate::img::Img;
+
 impl ExecContext {
     pub fn execute_builtin(&mut self, tok: &str) -> Result<(), ExecError> {
         match tok {
@@ -18,6 +21,7 @@ impl ExecContext {
             },
 
             "split" => {
+                // COLOR split, SIZE split
                 let stackval = self.stack.pop()
                     .ok_or_else(|| ExecError::new("stack underflow") )?;
                 match stackval {
@@ -35,6 +39,45 @@ impl ExecContext {
                         return Err(ExecError::new(&msg));
                     }
                 }
+            },
+
+            "image" => {
+                // SIZE COLOR image, INT INT COLOR image
+                // SIZE NUM image, INT INT NUM image
+                let color: Pix<f32>;
+                let size: (i32, i32);
+                
+                let colorval = self.stack.pop()
+                    .ok_or_else(|| ExecError::new("stack underflow") )?;
+                match colorval {
+                    StackValue::Color(pix) => {
+                        color = pix;
+                    },
+                    StackValue::Integer(ival) => {
+                        color = Pix::grey(ival as f32);
+                    },
+                    StackValue::Float(fval) => {
+                        color = Pix::grey(fval);
+                    },
+                    _ => {
+                        let msg = format!("image needs color or num: {:?}", colorval);
+                        return Err(ExecError::new(&msg));
+                    }
+                }
+
+                let sizeval = self.stack.pop()
+                    .ok_or_else(|| ExecError::new("stack underflow") )?;
+                match sizeval {
+                    StackValue::Size(wval, hval) => {
+                        size = (wval, hval);
+                    },
+                    _ => {
+                        let msg = format!("image needs size or num num: {:?}", sizeval);
+                        return Err(ExecError::new(&msg));
+                    }
+                }
+                
+                println!("### {:?} {:?}", size, color);
             },
             
             _ => {
