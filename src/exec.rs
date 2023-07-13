@@ -59,6 +59,31 @@ impl ExecContext {
         }
     }
 
+    pub fn pop_float(&mut self, label: &str) -> Result<f32, ExecError> {
+        let val = self.pop(label)?;
+        
+        if let StackValue::Float(fval) = val {
+            Ok(fval)
+        }
+        else {
+            let msg = format!("{} needs str: {:?}", label, val);
+            Err(ExecError::new(&msg))
+        }
+    }
+
+    pub fn pop_as_float(&mut self, label: &str) -> Result<f32, ExecError> {
+        let val = self.pop(label)?;
+
+        match val {
+            StackValue::Float(fval) => Ok(fval),
+            StackValue::Integer(ival) => Ok(ival as f32),
+            _ => {
+                let msg = format!("{} needs num: {:?}", label, val);
+                Err(ExecError::new(&msg))
+            }
+        }
+    }
+
     pub fn pop_str(&mut self, label: &str) -> Result<String, ExecError> {
         let val = self.pop(label)?;
         
