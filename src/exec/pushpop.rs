@@ -41,19 +41,6 @@ impl ExecContext {
         }
     }
 
-    pub fn pop_as_float(&mut self, label: &str) -> Result<f32, ExecError> {
-        let val = self.pop(label)?;
-
-        match val {
-            StackValue::Float(fval) => Ok(fval),
-            StackValue::Integer(ival) => Ok(ival as f32),
-            _ => {
-                let msg = format!("{} needs num: {:?}", label, val);
-                Err(ExecError::new(&msg))
-            }
-        }
-    }
-
     pub fn pop_str(&mut self, label: &str) -> Result<String, ExecError> {
         let val = self.pop(label)?;
         
@@ -78,6 +65,42 @@ impl ExecContext {
         }
     }
 
+    pub fn pop_as_float(&mut self, label: &str) -> Result<f32, ExecError> {
+        let val = self.pop(label)?;
+
+        match val {
+            StackValue::Float(fval) => Ok(fval),
+            StackValue::Integer(ival) => Ok(ival as f32),
+            _ => {
+                let msg = format!("{} needs num: {:?}", label, val);
+                Err(ExecError::new(&msg))
+            }
+        }
+    }
+
+    pub fn pop_as_size(&mut self, label: &str) -> Result<(i32, i32), ExecError> {
+        let val = self.pop(label)?;
+
+        match val {
+            StackValue::Image(img) => Ok((img.width as i32, img.height as i32)),
+            StackValue::Size(width, height) => Ok((width, height)),
+            StackValue::Integer(height) => {
+                let val2 = self.pop(label)?;
+                if let StackValue::Integer(width) = val2 {
+                    Ok((width, height))
+                }
+                else {
+                    let msg = format!("{} needs size, img, or num num: {:?}", label, val);
+                    Err(ExecError::new(&msg))
+                }
+            },
+            _ => {
+                let msg = format!("{} needs size, img, or num num: {:?}", label, val);
+                Err(ExecError::new(&msg))
+            }
+        }
+    }
+    
     pub fn push(&mut self, val: StackValue) {
         self.stack.push(val);
     }
