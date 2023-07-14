@@ -38,7 +38,7 @@ pub fn elementwise<F>(varg1: StackValue, varg2: StackValue, func: F) -> Result<S
             Ok(StackValue::Color(res))
         },
         (StackValue::Float(fl), StackValue::Color(pix)) => {
-            let res: Pix<f32> = Pix::new(func(&pix.r, &fl), func(&pix.g, &fl), func(&pix.b, &fl));
+            let res: Pix<f32> = Pix::new(func(&fl, &pix.r), func(&fl, &pix.g), func(&fl, &pix.b));
             Ok(StackValue::Color(res))
         },
         (StackValue::Image(img), StackValue::Float(fl)) => {
@@ -46,7 +46,7 @@ pub fn elementwise<F>(varg1: StackValue, varg2: StackValue, func: F) -> Result<S
             Ok(StackValue::Image(Rc::new(res)))
         },
         (StackValue::Float(fl), StackValue::Image(img)) => {
-            let res = img.map_val(|val| func(val, &fl));
+            let res = img.map_val(|val| func(&fl, val));
             Ok(StackValue::Image(Rc::new(res)))
         },
         (StackValue::Image(img), StackValue::Color(pix)) => {
@@ -54,7 +54,7 @@ pub fn elementwise<F>(varg1: StackValue, varg2: StackValue, func: F) -> Result<S
             Ok(StackValue::Image(Rc::new(res)))
         },
         (StackValue::Color(pix), StackValue::Image(img)) => {
-            let res = img.map(|val| Pix::new(func(&val.r, &pix.r), func(&val.g, &pix.g), func(&val.b, &pix.b)));
+            let res = img.map(|val| Pix::new(func(&pix.r, &val.r), func(&pix.g, &val.g), func(&pix.b, &val.b)));
             Ok(StackValue::Image(Rc::new(res)))
         },
         (xarg1, xarg2) => {
