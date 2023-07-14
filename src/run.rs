@@ -23,5 +23,7 @@ pub fn run(opts: &AppOptions) -> Result<(), Box<dyn Error>> {
 
     println!("stack: {:?}", &ctx.stack());
     
+    ctx.unloadargs(&opts.outfiles)?;
+
     Ok(())
 }

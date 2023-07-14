@@ -58,15 +58,24 @@ impl ExecContext {
             else {
                 let u8img = ppmio::img_read(arg)?;
                 self.push_img(u8img.as_f32());
+                println!("read {}", arg);
             }
         }
         
         Ok(())
     }
 
-    pub fn execute(&mut self, script: &Script) -> Result<(), ExecError> {
-        println!("### running {:?}", script);
+    pub fn unloadargs(&mut self, outs: &Vec<String>) -> Result<(), ExecError> {
+        for out in outs {
+            let img = self.pop_img("output")?;
+            ppmio::img_write(out, img.as_u8())?;
+            println!("wrote {}", out);
+        }
 
+        Ok(())
+    }
+
+    pub fn execute(&mut self, script: &Script) -> Result<(), ExecError> {
         for tok in script.tokens() {
             match tok {
                 ScriptToken::Integer(val) => {
