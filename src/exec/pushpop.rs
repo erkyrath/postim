@@ -127,6 +127,11 @@ impl ExecContext {
         self.stack.push(StackValue::Color(val));
     }
 
+    pub fn push_colorv(&mut self, rval: f32, gval: f32, bval: f32) {
+        let pix: Pix<f32> = Pix::new(rval, gval, bval);
+        self.stack.push(StackValue::Color(pix));
+    }
+
     pub fn push_img(&mut self, val: Img<f32>) {
         self.stack.push(StackValue::Image(Rc::new(val)));
     }

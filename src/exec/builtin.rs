@@ -101,6 +101,38 @@ impl ExecContext {
                 self.push_img(inimg.as_f32());
             },
 
+            "*" => {
+                let varg2 = self.pop("*")?;
+                let varg1 = self.pop("*")?;
+                let arg2 = if let StackValue::Integer(ival) = varg2 {
+                    StackValue::Float(ival as f32)
+                }
+                else {
+                    varg2
+                };
+                let arg1 = if let StackValue::Integer(ival) = varg1 {
+                    StackValue::Float(ival as f32)
+                }
+                else {
+                    varg1
+                };
+                match (arg1, arg2) {
+                    (StackValue::Float(f1), StackValue::Float(f2)) => {
+                        self.push_float(f1 * f2);
+                    },
+                    (StackValue::Color(pix), StackValue::Float(fl)) => {
+                        self.push_colorv(pix.r * fl, pix.g * fl, pix.b * fl);
+                    },
+                    (StackValue::Float(fl), StackValue::Color(pix)) => {
+                        self.push_colorv(pix.r * fl, pix.g * fl, pix.b * fl);
+                    },
+                    (xarg1, xarg2) => {
+                        let msg = format!("cannot multiply: {:?} {:?}", xarg1, xarg2);
+                        return Err(ExecError::new(&msg));
+                    }
+                }
+            },
+
             "average" => {
                 // IMG contrast
                 let img: Rc<Img<f32>> = self.pop_img(tok)?;
