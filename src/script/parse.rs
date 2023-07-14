@@ -271,3 +271,13 @@ pub fn match_color(body: &str) -> Option<(u8, u8, u8)>
     }
 }
 
+pub fn match_size(body: &str) -> Option<(i32, i32)>
+{
+    if let Ok((_, ScriptToken::Size(width, height))) = parse_with_termination::<_, _, ()>(&body, parse_size) {
+        Some((width, height))
+    }
+    else {
+        None
+    }
+}
+

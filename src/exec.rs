@@ -49,6 +49,9 @@ impl ExecContext {
             else if let Some((rval, gval, bval)) = parse::match_color(arg) {
                 self.push_colorv(rval as f32, gval as f32, bval as f32);
             }
+            else if let Some((width, height)) = parse::match_size(arg) {
+                self.push_size(width, height);
+            }
             else {
                 let u8img = ppmio::img_read(arg)?;
                 self.push_img(u8img.as_f32());
