@@ -120,6 +120,9 @@ impl ExecContext {
                     (StackValue::Float(f1), StackValue::Float(f2)) => {
                         self.push_float(f1 * f2);
                     },
+                    (StackValue::Color(p1), StackValue::Color(p2)) => {
+                        self.push_colorv(p1.r * p2.r, p1.g * p2.g, p1.b * p2.b);
+                    },
                     (StackValue::Color(pix), StackValue::Float(fl)) => {
                         self.push_colorv(pix.r * fl, pix.g * fl, pix.b * fl);
                     },
