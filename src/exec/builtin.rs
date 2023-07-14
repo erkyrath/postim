@@ -6,6 +6,7 @@ use crate::img::ppmio;
 use crate::exec::StackValue;
 use crate::exec::ExecContext;
 use crate::exec::except::ExecError;
+use crate::exec::util::elementwise;
 
 impl ExecContext {
     pub fn execute_builtin(&mut self, tok: &str) -> Result<(), ExecError> {
@@ -110,56 +111,8 @@ impl ExecContext {
             "*" => {
                 let varg2 = self.pop("*")?;
                 let varg1 = self.pop("*")?;
-                let arg2 = if let StackValue::Integer(ival) = varg2 {
-                    StackValue::Float(ival as f32)
-                }
-                else {
-                    varg2
-                };
-                let arg1 = if let StackValue::Integer(ival) = varg1 {
-                    StackValue::Float(ival as f32)
-                }
-                else {
-                    varg1
-                };
-                match (arg1, arg2) {
-                    (StackValue::Float(f1), StackValue::Float(f2)) => {
-                        self.push_float(f1 * f2);
-                    },
-                    (StackValue::Color(p1), StackValue::Color(p2)) => {
-                        self.push_colorv(p1.r * p2.r, p1.g * p2.g, p1.b * p2.b);
-                    },
-                    (StackValue::Image(img1), StackValue::Image(img2)) => {
-                        let res = img1.combine_val(&img2, |v1, v2| v1*v2);
-                        self.push_img(res);
-                    },
-                    (StackValue::Color(pix), StackValue::Float(fl)) => {
-                        self.push_colorv(pix.r * fl, pix.g * fl, pix.b * fl);
-                    },
-                    (StackValue::Float(fl), StackValue::Color(pix)) => {
-                        self.push_colorv(pix.r * fl, pix.g * fl, pix.b * fl);
-                    },
-                    (StackValue::Image(img), StackValue::Float(fl)) => {
-                        let res = img.map_val(|val| val*fl);
-                        self.push_img(res);
-                    },
-                    (StackValue::Float(fl), StackValue::Image(img)) => {
-                        let res = img.map_val(|val| val*fl);
-                        self.push_img(res);
-                    },
-                    (StackValue::Image(img), StackValue::Color(pix)) => {
-                        let res = img.map(|val| Pix::new(val.r*pix.r, val.g*pix.g, val.b*pix.b));
-                        self.push_img(res);
-                    },
-                    (StackValue::Color(pix), StackValue::Image(img)) => {
-                        let res = img.map(|val| Pix::new(val.r*pix.r, val.g*pix.g, val.b*pix.b));
-                        self.push_img(res);
-                    },
-                    (xarg1, xarg2) => {
-                        let msg = format!("cannot multiply: {:?} {:?}", xarg1, xarg2);
-                        return Err(ExecError::new(&msg));
-                    }
-                }
+                let stackval = elementwise(varg1, varg2, |v1, v2| v1*v2)?;
+                self.push(stackval);
             },
 
             "average" => {
