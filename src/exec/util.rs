@@ -23,38 +23,38 @@ pub fn elementwise<F>(varg1: StackValue, varg2: StackValue, func: F) -> Result<S
     
     match (arg1, arg2) {
         (StackValue::Float(f1), StackValue::Float(f2)) => {
-            Ok(StackValue::Float(f1 * f2))
+            Ok(StackValue::Float(func(&f1, &f2)))
         },
         (StackValue::Color(p1), StackValue::Color(p2)) => {
-            let res: Pix<f32> = Pix::new(p1.r * p2.r, p1.g * p2.g, p1.b * p2.b);
+            let res: Pix<f32> = Pix::new(func(&p1.r, &p2.r), func(&p1.g, &p2.g), func(&p1.b, &p2.b));
             Ok(StackValue::Color(res))
         },
         (StackValue::Image(img1), StackValue::Image(img2)) => {
-            let res = img1.combine_val(&img2, |v1, v2| v1*v2);
+            let res = img1.combine_val(&img2, func);
             Ok(StackValue::Image(Rc::new(res)))
         },
         (StackValue::Color(pix), StackValue::Float(fl)) => {
-            let res: Pix<f32> = Pix::new(pix.r * fl, pix.g * fl, pix.b * fl);
+            let res: Pix<f32> = Pix::new(func(&pix.r, &fl), func(&pix.g, &fl), func(&pix.b, &fl));
             Ok(StackValue::Color(res))
         },
         (StackValue::Float(fl), StackValue::Color(pix)) => {
-            let res: Pix<f32> = Pix::new(pix.r * fl, pix.g * fl, pix.b * fl);
+            let res: Pix<f32> = Pix::new(func(&pix.r, &fl), func(&pix.g, &fl), func(&pix.b, &fl));
             Ok(StackValue::Color(res))
         },
         (StackValue::Image(img), StackValue::Float(fl)) => {
-            let res = img.map_val(|val| val*fl);
+            let res = img.map_val(|val| func(val, &fl));
             Ok(StackValue::Image(Rc::new(res)))
         },
         (StackValue::Float(fl), StackValue::Image(img)) => {
-            let res = img.map_val(|val| val*fl);
+            let res = img.map_val(|val| func(val, &fl));
             Ok(StackValue::Image(Rc::new(res)))
         },
         (StackValue::Image(img), StackValue::Color(pix)) => {
-            let res = img.map(|val| Pix::new(val.r*pix.r, val.g*pix.g, val.b*pix.b));
+            let res = img.map(|val| Pix::new(func(&val.r, &pix.r), func(&val.g, &pix.g), func(&val.b, &pix.b)));
             Ok(StackValue::Image(Rc::new(res)))
         },
         (StackValue::Color(pix), StackValue::Image(img)) => {
-            let res = img.map(|val| Pix::new(val.r*pix.r, val.g*pix.g, val.b*pix.b));
+            let res = img.map(|val| Pix::new(func(&val.r, &pix.r), func(&val.g, &pix.g), func(&val.b, &pix.b)));
             Ok(StackValue::Image(Rc::new(res)))
         },
         (xarg1, xarg2) => {
