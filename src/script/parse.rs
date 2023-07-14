@@ -188,8 +188,15 @@ fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str
 }
 
 fn parse_anytokenlist<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, Vec<ScriptToken>, E> {
+    multi::many0(
+        parse_anytoken
+    )(input)
+}
+
+fn parse_with_termination<'a, F, E: ParseError<&'a str>>(input: &'a str, func: F) -> IResult<&'a str, Vec<ScriptToken>, E>
+where F: Fn(&'a str) -> IResult<&'a str, Vec<ScriptToken>, E> {
     sequence::terminated(
-        multi::many0(parse_anytoken),
+        func,
         combinator::eof
     )(input)
 }
@@ -202,7 +209,7 @@ pub fn load_script(filename: &str) -> Result<Script, String> {
 
     // parser returns Result<(&str, Vec<ScriptToken>), nom::Err<VerboseError<&str>>>
     
-    let res = parse_anytokenlist::<VerboseError<&str>>(&body)
+    let res = parse_with_termination::<_, VerboseError<&str>>(&body, parse_anytokenlist)
         .map_err(|err| {
             match err {
                 Err::Error(verberr) => {
