@@ -31,13 +31,6 @@ pub fn parse_whitespace<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&
     )(input)
 }
 
-pub fn parse_oparrow<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
-    combinator::map(
-        bytes::complete::tag(">>"),
-        |_| ScriptToken::OpArrow
-    )(input)
-}
-
 pub fn parse_string<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     combinator::map(
         // for escaped chars, see https://github.com/rust-bakery/nom/blob/main/examples/string.rs
@@ -223,13 +216,21 @@ pub fn load_script(filename: &str) -> Result<Script, String> {
 
     let mut tokens: Vec<ScriptToken> = Vec::new();
     let mut wasarrow = false;
-    
+
     for tok in rawtokens {    // consume original
         match tok {
             ScriptToken::Whitespace => {},
             ScriptToken::Comment => {},
-            ScriptToken::OpArrow => {
-                wasarrow = true;
+            ScriptToken::Operator(val) => {
+                if val == ">>".to_string() {
+                    wasarrow = true;
+                }
+                else if wasarrow {
+                    return Err(format!("{}: arrow needs name, found {:?}", filename, val));
+                }
+                else {
+                    tokens.push(ScriptToken::Name(val));
+                }
             }
             ScriptToken::Name(val) => {
                 if wasarrow {
