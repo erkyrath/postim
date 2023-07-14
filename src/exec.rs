@@ -58,7 +58,7 @@ impl ExecContext {
             else {
                 let u8img = ppmio::img_read(arg)?;
                 self.push_img(u8img.as_f32());
-                println!("read {}", arg);
+                println!("read {} {}x{}", arg, u8img.width, u8img.height);
             }
         }
         
@@ -69,7 +69,7 @@ impl ExecContext {
         for out in outs {
             let img = self.pop_img("output")?;
             ppmio::img_write(out, img.as_u8())?;
-            println!("wrote {}", out);
+            println!("wrote {} {}x{}", out, img.width, img.height);
         }
 
         Ok(())
