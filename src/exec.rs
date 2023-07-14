@@ -10,6 +10,7 @@ use crate::exec::except::ExecError;
 pub mod except;
 pub mod pushpop;
 pub mod builtin;
+pub mod util;
 
 #[derive(Debug, Clone)]
 pub enum StackValue {
