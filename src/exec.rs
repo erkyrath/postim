@@ -39,6 +39,10 @@ impl ExecContext {
         &self.stack
     }
 
+    pub fn loadargs(&mut self, args: &Vec<String>) -> Result<(), ExecError> {
+        Ok(())
+    }
+
     pub fn execute(&mut self, script: &Script) -> Result<(), ExecError> {
         println!("### running {:?}", script);
 

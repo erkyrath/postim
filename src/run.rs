@@ -15,6 +15,8 @@ pub fn run(opts: &AppOptions) -> Result<(), Box<dyn Error>> {
 
     let mut ctx = ExecContext::new();
 
+    ctx.loadargs(&opts.infiles)?;
+
     for script in &scripts {
         ctx.execute(&script)?;
     }
