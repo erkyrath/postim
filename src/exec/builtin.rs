@@ -147,6 +147,14 @@ impl ExecContext {
                         let res = img.map_val(|val| val*fl);
                         self.push_img(res);
                     },
+                    (StackValue::Image(img), StackValue::Color(pix)) => {
+                        let res = img.map(|val| Pix::new(val.r*pix.r, val.g*pix.g, val.b*pix.b));
+                        self.push_img(res);
+                    },
+                    (StackValue::Color(pix), StackValue::Image(img)) => {
+                        let res = img.map(|val| Pix::new(val.r*pix.r, val.g*pix.g, val.b*pix.b));
+                        self.push_img(res);
+                    },
                     (xarg1, xarg2) => {
                         let msg = format!("cannot multiply: {:?} {:?}", xarg1, xarg2);
                         return Err(ExecError::new(&msg));
