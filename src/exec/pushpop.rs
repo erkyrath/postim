@@ -103,6 +103,34 @@ impl ExecContext {
         }
     }
     
+    pub fn pop_as_color(&mut self, label: &str) -> Result<Pix<f32>, ExecError> {
+        match &self.stack[..] {
+            [.., StackValue::Color(pix) ] => {
+                let res = pix.clone();
+                self.pop(label)?;
+                Ok(res)
+            },
+            [.., StackValue::Integer(rval), StackValue::Integer(gval), StackValue::Integer(bval) ] => {
+                let res: Pix<f32> = Pix::new(*rval as f32, *gval as f32, *bval as f32);
+                self.pop(label)?;
+                self.pop(label)?;
+                self.pop(label)?;
+                Ok(res)
+            },
+            [.., StackValue::Float(rval), StackValue::Float(gval), StackValue::Float(bval) ] => {
+                let res: Pix<f32> = Pix::new(*rval, *gval, *bval);
+                self.pop(label)?;
+                self.pop(label)?;
+                self.pop(label)?;
+                Ok(res)
+            },
+            _ => {
+                let msg = format!("{} needs color or num num num", label);
+                Err(ExecError::new(&msg))
+            }
+        }
+    }
+    
     pub fn push(&mut self, val: StackValue) {
         self.stack.push(val);
     }

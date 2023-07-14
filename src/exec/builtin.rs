@@ -54,6 +54,12 @@ impl ExecContext {
                 self.push_size(width, height);
             },
 
+            "color" => {
+                // NUM NUM NUM color, COLOR color
+                let pix = self.pop_as_color(tok)?;
+                self.push_color(pix);
+            },
+
             "image" => {
                 // SIZE COLOR image, INT INT COLOR image
                 // SIZE NUM image, INT INT NUM image
