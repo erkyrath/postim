@@ -14,7 +14,7 @@ use nom::character;
 use crate::script::Script;
 use crate::script::ScriptToken;
 
-pub fn parse_comment<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
+fn parse_comment<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     combinator::value(
         ScriptToken::Comment,
         sequence::pair(
@@ -24,14 +24,14 @@ pub fn parse_comment<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a 
     )(input)
 }
 
-pub fn parse_whitespace<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
+fn parse_whitespace<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     combinator::value(
         ScriptToken::Whitespace,
         character::complete::multispace1
     )(input)
 }
 
-pub fn parse_string<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
+fn parse_string<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     combinator::map(
         // for escaped chars, see https://github.com/rust-bakery/nom/blob/main/examples/string.rs
         sequence::delimited(
@@ -43,7 +43,7 @@ pub fn parse_string<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a s
     )(input)
 }
 
-pub fn parse_tokterminator<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, &str, E> {
+fn parse_tokterminator<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, &str, E> {
     branch::alt((
         combinator::eof,
         character::complete::multispace1,
@@ -51,7 +51,7 @@ pub fn parse_tokterminator<'a, E: ParseError<&'a str>>(input: &'a str) -> IResul
     ))(input)
 }
 
-pub fn parse_name<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
+fn parse_name<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     combinator::map(
         combinator::recognize(
             sequence::tuple((
@@ -64,7 +64,7 @@ pub fn parse_name<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str
     )(input)
 }
 
-pub fn parse_operator<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
+fn parse_operator<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     combinator::map(
         combinator::recognize(
             multi::many1(
@@ -75,7 +75,7 @@ pub fn parse_operator<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a
     )(input)
 }
 
-pub fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
+fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
    let (pinput, pstr) = combinator::recognize(
        sequence::tuple((
            combinator::opt(character::complete::char('-')),
@@ -91,7 +91,7 @@ pub fn parse_integer<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a 
    return Ok( (pinput, ScriptToken::Integer(ival)) );
 }
 
-pub fn parse_float<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
+fn parse_float<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     combinator::map(
         sequence::terminated(
             nom::number::complete::float,
@@ -101,7 +101,7 @@ pub fn parse_float<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a st
     )(input)
 }
 
-pub fn parse_size<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
+fn parse_size<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     let (pinput, (pstr1, pstr2)) =
     sequence::separated_pair(
         combinator::recognize(
@@ -131,7 +131,7 @@ pub fn parse_size<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str
     return Ok( (pinput, ScriptToken::Size(ival1, ival2)) );
 }
 
-pub fn parse_color<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
+fn parse_color<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     let (pinput, pstr) = combinator::recognize(
         sequence::tuple((
             character::complete::char('$'),
@@ -166,7 +166,7 @@ pub fn parse_color<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a st
     }
 }
 
-pub fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
+fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     branch::alt((
         parse_comment,
         parse_whitespace,
@@ -180,7 +180,7 @@ pub fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a
     ))(input)
 }
 
-pub fn parse_anytokenlist<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, Vec<ScriptToken>, E> {
+fn parse_anytokenlist<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, Vec<ScriptToken>, E> {
     sequence::terminated(
         multi::many0(parse_anytoken),
         combinator::eof
