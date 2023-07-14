@@ -202,7 +202,7 @@ pub fn load_script(filename: &str) -> Result<Script, String> {
 
     // parser returns Result<(&str, Vec<ScriptToken>), nom::Err<VerboseError<&str>>>
     
-    let res = parse_with_termination::<Vec<ScriptToken>, _, VerboseError<&str>>(&body, parse_anytokenlist)
+    let (_, rawtokens): (_, Vec<ScriptToken>) = parse_with_termination::<_, _, VerboseError<&str>>(&body, parse_anytokenlist)
         .map_err(|err| {
             match err {
                 Err::Error(verberr) => {
@@ -218,8 +218,6 @@ pub fn load_script(filename: &str) -> Result<Script, String> {
                 },
             }
         })?;
-
-    let (_, rawtokens) = res;
 
     let mut tokens: Vec<ScriptToken> = Vec::new();
     let mut wasarrow = false;

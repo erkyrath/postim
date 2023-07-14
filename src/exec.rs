@@ -46,7 +46,7 @@ impl ExecContext {
             if let Ok(fval) = arg.parse::<f32>() {
                 self.push_float(fval);
             }
-            if let Some((rval, gval, bval)) = parse::match_color(arg) {
+            else if let Some((rval, gval, bval)) = parse::match_color(arg) {
                 self.push_colorv(rval as f32, gval as f32, bval as f32);
             }
             else {
