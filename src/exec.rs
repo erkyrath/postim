@@ -6,6 +6,7 @@ use crate::img::Img;
 use crate::script::Script;
 use crate::script::ScriptToken;
 use crate::exec::except::ExecError;
+use crate::img::ppmio;
 
 pub mod except;
 pub mod pushpop;
@@ -40,6 +41,16 @@ impl ExecContext {
     }
 
     pub fn loadargs(&mut self, args: &Vec<String>) -> Result<(), ExecError> {
+        for arg in args {
+            if let Ok(fval) = arg.parse::<f32>() {
+                self.push_float(fval);
+            }
+            else {
+                let u8img = ppmio::img_read(arg)?;
+                self.push_img(u8img.as_f32());
+            }
+        }
+        
         Ok(())
     }
 
