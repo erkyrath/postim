@@ -129,6 +129,10 @@ impl ExecContext {
                     (StackValue::Color(p1), StackValue::Color(p2)) => {
                         self.push_colorv(p1.r * p2.r, p1.g * p2.g, p1.b * p2.b);
                     },
+                    (StackValue::Image(img1), StackValue::Image(img2)) => {
+                        let res = img1.combine_val(&img2, |v1, v2| v1*v2);
+                        self.push_img(res);
+                    },
                     (StackValue::Color(pix), StackValue::Float(fl)) => {
                         self.push_colorv(pix.r * fl, pix.g * fl, pix.b * fl);
                     },
