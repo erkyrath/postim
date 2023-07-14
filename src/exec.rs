@@ -43,7 +43,10 @@ impl ExecContext {
 
     pub fn loadargs(&mut self, args: &Vec<String>) -> Result<(), ExecError> {
         for arg in args {
-            if let Ok(fval) = arg.parse::<f32>() {
+            if let Ok(ival) = arg.parse::<i32>() {
+                self.push_int(ival);
+            }
+            else if let Ok(fval) = arg.parse::<f32>() {
                 self.push_float(fval);
             }
             else if let Some((rval, gval, bval)) = parse::match_color(arg) {
