@@ -79,23 +79,25 @@ impl ExecContext {
     }
 
     pub fn pop_as_size(&mut self, label: &str) -> Result<(i32, i32), ExecError> {
-        let val = self.pop(label)?;
-
-        match val {
-            StackValue::Image(img) => Ok((img.width as i32, img.height as i32)),
-            StackValue::Size(width, height) => Ok((width, height)),
-            StackValue::Integer(height) => {
-                let val2 = self.pop(label)?;
-                if let StackValue::Integer(width) = val2 {
-                    Ok((width, height))
-                }
-                else {
-                    let msg = format!("{} needs size, img, or num num: {:?}", label, val);
-                    Err(ExecError::new(&msg))
-                }
+        match &self.stack[..] {
+            [.., StackValue::Image(img) ] => {
+                let res = (img.width as i32, img.height as i32);
+                self.pop(label)?;
+                Ok(res)
+            },
+            [.., StackValue::Size(width, height) ] => {
+                let res = (*width, *height);
+                self.pop(label)?;
+                Ok(res)
+            },
+            [.., StackValue::Integer(height), StackValue::Integer(width) ] => {
+                let res = (*width, *height);
+                self.pop(label)?;
+                self.pop(label)?;
+                Ok(res)
             },
             _ => {
-                let msg = format!("{} needs size, img, or num num: {:?}", label, val);
+                let msg = format!("{} needs size, img, or int int", label);
                 Err(ExecError::new(&msg))
             }
         }
