@@ -6,6 +6,7 @@ use crate::img::Img;
 use crate::script::Script;
 use crate::script::ScriptToken;
 use crate::exec::except::ExecError;
+use crate::script::parse;
 use crate::img::ppmio;
 
 pub mod except;
@@ -44,6 +45,9 @@ impl ExecContext {
         for arg in args {
             if let Ok(fval) = arg.parse::<f32>() {
                 self.push_float(fval);
+            }
+            if let Some((rval, gval, bval)) = parse::match_color(arg) {
+                self.push_colorv(rval as f32, gval as f32, bval as f32);
             }
             else {
                 let u8img = ppmio::img_read(arg)?;
