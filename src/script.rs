@@ -8,6 +8,7 @@ pub enum ScriptToken {
     Comment,      // parse only
     OpArrow,      // parse only
     Name(String),
+    Operator(String),
     StoreTo(String),
     String(String),
     Integer(i32),

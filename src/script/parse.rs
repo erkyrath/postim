@@ -54,7 +54,7 @@ pub fn parse_tokterminator<'a, E: ParseError<&'a str>>(input: &'a str) -> IResul
     branch::alt((
         combinator::eof,
         character::complete::multispace1,
-        bytes::complete::take_while1(|ch: char| ch == '#' || ch == '-' || ch == '+' || ch == '<' || ch == '>')
+        bytes::complete::take_while1(|ch: char| ch == '#' || ch == '-' || ch == '+' || ch == '*' || ch == '/' || ch == '=' || ch == '<' || ch == '>' || ch == '&' || ch == '|')
     ))(input)
 }
 
@@ -68,6 +68,17 @@ pub fn parse_name<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str
             ))
         ),
         |val| ScriptToken::Name(val.to_string())
+    )(input)
+}
+
+pub fn parse_operator<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
+    combinator::map(
+        combinator::recognize(
+            multi::many1(
+                character::complete::one_of("+-*/<>%&|=!")
+            )
+        ),
+        |val: &str| ScriptToken::Operator(val.to_string())
     )(input)
 }
 
@@ -166,13 +177,13 @@ pub fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a
     branch::alt((
         parse_comment,
         parse_whitespace,
-        parse_oparrow,
         parse_string,
         parse_name,
         parse_integer,
         parse_float,
         parse_size,
         parse_color,
+        parse_operator,
     ))(input)
 }
 
