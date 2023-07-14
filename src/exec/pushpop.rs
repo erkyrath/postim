@@ -24,7 +24,7 @@ impl ExecContext {
             Ok(ival)
         }
         else {
-            let msg = format!("{} needs str: {:?}", label, val);
+            let msg = format!("{} needs int: {:?}", label, val);
             Err(ExecError::new(&msg))
         }
     }
@@ -36,7 +36,7 @@ impl ExecContext {
             Ok(fval)
         }
         else {
-            let msg = format!("{} needs str: {:?}", label, val);
+            let msg = format!("{} needs float: {:?}", label, val);
             Err(ExecError::new(&msg))
         }
     }
