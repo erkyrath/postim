@@ -117,6 +117,25 @@ impl<T: Clone> Img<T> {
         res
     }
 
+    pub fn combine_val<F>(&self, other: &Img<T>, func: F) -> Img<T>
+    where F: Fn(&T, &T) -> T {
+        assert!(self.width == other.width);
+        assert!(self.height == other.height);
+        
+        let mut res = Img {
+            width: self.width,
+            height: self.height,
+            pixels: Vec::with_capacity(self.pixcount()),
+        };
+
+        for (val, valo) in std::iter::zip(&self.pixels, &other.pixels) {
+            let pix = Pix { r:func(&val.r, &valo.r), g:func(&val.g, &valo.g), b:func(&val.b, &valo.b) };
+            res.pixels.push(pix);
+        }
+
+        res
+    }
+
     pub fn convert<U: Clone, F>(&self, func: F) -> Img<U>
     where F: Fn(&T) -> U {
         let mut res = Img {
