@@ -90,7 +90,7 @@ impl ExecContext {
                 self.pop(label)?;
                 Ok(res)
             },
-            [.., StackValue::Integer(height), StackValue::Integer(width) ] => {
+            [.., StackValue::Integer(width), StackValue::Integer(height) ] => {
                 let res = (*width, *height);
                 self.pop(label)?;
                 self.pop(label)?;
