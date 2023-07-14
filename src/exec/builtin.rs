@@ -83,8 +83,6 @@ impl ExecContext {
                 // SIZE COLOR image, INT INT COLOR image
                 // SIZE NUM image, INT INT NUM image
                 let color: Pix<f32>;
-                let width: i32;
-                let height: i32;
                 
                 let colorval = self.pop(tok)?;
                 match colorval {
@@ -103,27 +101,7 @@ impl ExecContext {
                     }
                 }
 
-                let sizeval = self.pop(tok)?;
-                match sizeval {
-                    StackValue::Size(wval, hval) => {
-                        (width, height) = (wval, hval);
-                    },
-                    StackValue::Integer(ival) => {
-                        height = ival;
-                        let widthval = self.pop(tok)?;
-                        if let StackValue::Integer(jval) = widthval {
-                            width = jval;
-                        }
-                        else {
-                            let msg = format!("image needs size or int int: {:?}", widthval);
-                            return Err(ExecError::new(&msg));
-                        }
-                    }
-                    _ => {
-                        let msg = format!("image needs size or int int: {:?}", sizeval);
-                        return Err(ExecError::new(&msg));
-                    }
-                }
+                let (width, height) = self.pop_as_size(tok)?;
                 
                 if width <= 0 || height <= 0 {
                     let msg = format!("image size must be positive: {width}x{height}");
