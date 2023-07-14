@@ -166,13 +166,6 @@ fn parse_color<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, S
     }
 }
 
-fn parse_wholecolor<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
-    sequence::terminated(
-        parse_color,
-        combinator::eof
-    )(input)
-}
-
 fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     branch::alt((
         parse_comment,
@@ -272,7 +265,7 @@ pub fn load_script(filename: &str) -> Result<Script, String> {
 
 pub fn match_color(body: &str) -> Option<(u8, u8, u8)>
 {
-    if let Ok((_, ScriptToken::Color(rval, gval, bval))) = parse_wholecolor::<()>(&body) {
+    if let Ok((_, ScriptToken::Color(rval, gval, bval))) = parse_with_termination::<_, _, ()>(&body, parse_color) {
         Some((rval, gval, bval))
     }
     else {
