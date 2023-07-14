@@ -108,10 +108,31 @@ impl ExecContext {
                 self.push_img(inimg.as_f32());
             },
 
+            "+" => {
+                let varg2 = self.pop("+")?;
+                let varg1 = self.pop("+")?;
+                let stackval = elementwise(varg1, varg2, |v1, v2| v1+v2)?;
+                self.push(stackval);
+            },
+
+            "-" => {
+                let varg2 = self.pop("-")?;
+                let varg1 = self.pop("-")?;
+                let stackval = elementwise(varg1, varg2, |v1, v2| v1-v2)?;
+                self.push(stackval);
+            },
+
             "*" => {
                 let varg2 = self.pop("*")?;
                 let varg1 = self.pop("*")?;
                 let stackval = elementwise(varg1, varg2, |v1, v2| v1*v2)?;
+                self.push(stackval);
+            },
+
+            "/" => {
+                let varg2 = self.pop("/")?;
+                let varg1 = self.pop("/")?;
+                let stackval = elementwise(varg1, varg2, |v1, v2| v1/v2)?;
                 self.push(stackval);
             },
 
