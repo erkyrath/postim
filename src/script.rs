@@ -1,4 +1,5 @@
 use std::fmt;
+use std::rc::Rc;
 
 pub mod parse;
 
@@ -15,16 +16,16 @@ pub enum ScriptToken {
     Float(f32),
     Size(i32, i32),
     Color(u8, u8, u8),
-    Proc(),
+    Proc(Rc<Vec<ScriptToken>>),
 }
 
 pub struct Script {
     filename: String,
-    tokens: Vec<ScriptToken>,
+    tokens: Rc<Vec<ScriptToken>>,
 }
 
 impl Script {
-    pub fn new(filename: &str, tokens: Vec<ScriptToken>) -> Script {
+    pub fn new(filename: &str, tokens: Rc<Vec<ScriptToken>>) -> Script {
         Script {
             filename: filename.to_string(),
             tokens

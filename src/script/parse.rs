@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use nom::IResult;
 use nom::Err;
 use nom::error::ParseError;
@@ -268,7 +270,16 @@ pub fn load_script(filename: &str) -> Result<Script, String> {
         return Err(format!("{}: arrow needs name", filename));
     }
 
-    Ok(Script::new(filename, tokens))
+    fn buildwrap(mut iter: std::slice::Iter<'_, ScriptToken>) -> Result<Rc<Vec<ScriptToken>>, String> {
+        let mut ls: Vec<ScriptToken> = Vec::new();
+        while let Some(tok) = iter.next() {
+            ls.push(tok.clone());
+        }
+        Ok(Rc::new(ls))
+    }
+    let wrappedtokens = buildwrap(tokens.iter())?;
+
+    Ok(Script::new(filename, wrappedtokens))
 }
 
 pub fn match_color(body: &str) -> Option<(u8, u8, u8)>
