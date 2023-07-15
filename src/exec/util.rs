@@ -30,6 +30,10 @@ pub fn elementwise<F>(varg1: StackValue, varg2: StackValue, func: F) -> Result<S
             Ok(StackValue::Color(res))
         },
         (StackValue::Image(img1), StackValue::Image(img2)) => {
+            if img1.size() != img2.size() {
+                let msg = format!("image sizes do not match: {:?} {:?}", img1, img2);
+                return Err(ExecError::new(&msg));
+            }
             let res = img1.combine_val(&img2, func);
             Ok(StackValue::Image(Rc::new(res)))
         },
@@ -58,7 +62,7 @@ pub fn elementwise<F>(varg1: StackValue, varg2: StackValue, func: F) -> Result<S
             Ok(StackValue::Image(Rc::new(res)))
         },
         (xarg1, xarg2) => {
-            let msg = format!("cannot multiply: {:?} {:?}", xarg1, xarg2);
+            let msg = format!("no arithmetic operation: {:?} {:?}", xarg1, xarg2);
             Err(ExecError::new(&msg))
         }
     }
