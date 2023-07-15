@@ -4,9 +4,10 @@ pub mod parse;
 
 #[derive(Debug, Clone)]
 pub enum ScriptToken {
-    Whitespace,       // parse only
-    Comment,          // parse only
-    Operator(String), // parse only
+    Whitespace,        // parse only
+    Comment,           // parse only
+    Operator(String),  // parse only
+    Delimiter(String), // parse only
     Name(String),
     StoreTo(String),
     String(String),
@@ -14,6 +15,7 @@ pub enum ScriptToken {
     Float(f32),
     Size(i32, i32),
     Color(u8, u8, u8),
+    Proc(),
 }
 
 pub struct Script {

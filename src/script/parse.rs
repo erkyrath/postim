@@ -47,7 +47,7 @@ fn parse_tokterminator<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'
     branch::alt((
         combinator::eof,
         character::complete::multispace1,
-        bytes::complete::take_while1(|ch: char| ch == '#' || ch == '-' || ch == '+' || ch == '*' || ch == '/' || ch == '=' || ch == '<' || ch == '>' || ch == '&' || ch == '|')
+        bytes::complete::take_while1(|ch: char| ch == '#' || ch == '-' || ch == '+' || ch == '*' || ch == '/' || ch == '=' || ch == '<' || ch == '>' || ch == '&' || ch == '|' || ch == '}' || ch == '{')
     ))(input)
 }
 
@@ -72,6 +72,15 @@ fn parse_operator<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str
             )
         ),
         |val: &str| ScriptToken::Operator(val.to_string())
+    )(input)
+}
+
+fn parse_delimiter<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
+    combinator::map(
+        combinator::recognize(
+            character::complete::one_of("{}")
+        ),
+        |val: &str| ScriptToken::Delimiter(val.to_string())
     )(input)
 }
 
@@ -177,6 +186,7 @@ fn parse_anytoken<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str
         parse_size,
         parse_color,
         parse_operator,
+        parse_delimiter,
     ))(input)
 }
 
