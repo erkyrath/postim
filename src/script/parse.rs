@@ -270,15 +270,18 @@ pub fn load_script(filename: &str) -> Result<Script, String> {
         return Err(format!("{}: arrow needs name", filename));
     }
 
-    fn buildwrap(iter: &mut std::vec::IntoIter<ScriptToken>) -> Result<Rc<Vec<ScriptToken>>, String> {
+    fn buildwrap(iter: &mut std::vec::IntoIter<ScriptToken>, istop: bool) -> Result<Rc<Vec<ScriptToken>>, String> {
         let mut ls: Vec<ScriptToken> = Vec::new();
         while let Some(tok) = iter.next() {
             if let ScriptToken::Delimiter(delim) = tok {
                 if delim == "}" {
+                    if istop {
+                        return Err(format!("unmatched close brace"));
+                    }
                     return Ok(Rc::new(ls));
                 }
                 else if delim == "{" {
-                    let proc = buildwrap(iter)?;
+                    let proc = buildwrap(iter, false)?;
                     ls.push(ScriptToken::Proc(proc));
                     continue;
                 }
@@ -288,9 +291,12 @@ pub fn load_script(filename: &str) -> Result<Script, String> {
             }
             ls.push(tok);
         }
+        if !istop {
+            return Err(format!("unclosed open brace"));
+        }
         Ok(Rc::new(ls))
     }
-    let wrappedtokens = buildwrap(&mut tokens.into_iter())?; // consume original
+    let wrappedtokens = buildwrap(&mut tokens.into_iter(), true)?; // consume original
 
     Ok(Script::new(filename, wrappedtokens))
 }
