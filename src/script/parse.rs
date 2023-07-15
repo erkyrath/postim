@@ -270,14 +270,14 @@ pub fn load_script(filename: &str) -> Result<Script, String> {
         return Err(format!("{}: arrow needs name", filename));
     }
 
-    fn buildwrap(mut iter: std::slice::Iter<'_, ScriptToken>) -> Result<Rc<Vec<ScriptToken>>, String> {
+    fn buildwrap(mut iter: std::vec::IntoIter<ScriptToken>) -> Result<Rc<Vec<ScriptToken>>, String> {
         let mut ls: Vec<ScriptToken> = Vec::new();
         while let Some(tok) = iter.next() {
-            ls.push(tok.clone());
+            ls.push(tok);
         }
         Ok(Rc::new(ls))
     }
-    let wrappedtokens = buildwrap(tokens.iter())?;
+    let wrappedtokens = buildwrap(tokens.into_iter())?; // consume original
 
     Ok(Script::new(filename, wrappedtokens))
 }
