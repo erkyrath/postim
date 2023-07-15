@@ -270,14 +270,27 @@ pub fn load_script(filename: &str) -> Result<Script, String> {
         return Err(format!("{}: arrow needs name", filename));
     }
 
-    fn buildwrap(mut iter: std::vec::IntoIter<ScriptToken>) -> Result<Rc<Vec<ScriptToken>>, String> {
+    fn buildwrap(iter: &mut std::vec::IntoIter<ScriptToken>) -> Result<Rc<Vec<ScriptToken>>, String> {
         let mut ls: Vec<ScriptToken> = Vec::new();
         while let Some(tok) = iter.next() {
+            if let ScriptToken::Delimiter(delim) = tok {
+                if delim == "}" {
+                    return Ok(Rc::new(ls));
+                }
+                else if delim == "{" {
+                    let proc = buildwrap(iter)?;
+                    ls.push(ScriptToken::Proc(proc));
+                    continue;
+                }
+                else {
+                    return Err(format!("unknown delimiter: {}", delim));
+                }
+            }
             ls.push(tok);
         }
         Ok(Rc::new(ls))
     }
-    let wrappedtokens = buildwrap(tokens.into_iter())?; // consume original
+    let wrappedtokens = buildwrap(&mut tokens.into_iter())?; // consume original
 
     Ok(Script::new(filename, wrappedtokens))
 }

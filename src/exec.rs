@@ -22,6 +22,7 @@ pub enum StackValue {
     Size(i32, i32),
     Color(Pix<f32>),
     Image(Rc<Img<f32>>),
+    Proc(Rc<Vec<ScriptToken>>),
 }
 
 pub struct ExecContext {
@@ -78,6 +79,9 @@ impl ExecContext {
     pub fn execute(&mut self, script: &Script) -> Result<(), ExecError> {
         for tok in script.tokens() {
             match tok {
+                ScriptToken::Proc(proc) => {
+                    self.push(StackValue::Proc(Rc::clone(proc)));
+                },
                 ScriptToken::Integer(val) => {
                     self.push(StackValue::Integer(*val));
                 },
