@@ -8,6 +8,7 @@ use crate::exec::ExecContext;
 use crate::exec::except::ExecError;
 use crate::exec::util::elementwise;
 
+#[derive(Debug, Clone)]
 pub enum BuiltInSymbol {
     Dup,
     Pop,
@@ -58,29 +59,29 @@ impl ExecContext {
         }
     }
     
-    pub fn execute_builtin(&mut self, tok: &str) -> Result<(), ExecError> {
-        match tok {
+    pub fn execute_builtin(&mut self, sym: BuiltInSymbol) -> Result<(), ExecError> {
+        match sym {
         
-            "dup" => {
+            BuiltInSymbol::Dup => {
                 let stackval = self.stack.last()
                     .ok_or_else(|| ExecError::new("stack underflow") )?;
                 self.push(stackval.clone());
             },
             
-            "pop" => {
-                let _ = self.pop(tok)?;
+            BuiltInSymbol::Pop => {
+                let _ = self.pop("###")?;
             },
 
-            "swap" => {
-                let val1 = self.pop(tok)?;
-                let val2 = self.pop(tok)?;
+            BuiltInSymbol::Swap => {
+                let val1 = self.pop("###")?;
+                let val2 = self.pop("###")?;
                 self.push(val1);
                 self.push(val2);
             },
 
-            "split" => {
+            BuiltInSymbol::Split => {
                 // COLOR split, SIZE split
-                let stackval = self.pop(tok)?;
+                let stackval = self.pop("###")?;
                 match stackval {
                     StackValue::Size(xval, yval) => {
                         self.push_int(xval);
@@ -98,24 +99,24 @@ impl ExecContext {
                 }
             },
 
-            "size" => {
+            BuiltInSymbol::Size => {
                 // INT INT size, IMAGE size, SIZE size
-                let (width, height) = self.pop_as_size(tok)?;
+                let (width, height) = self.pop_as_size("###")?;
                 self.push_size(width, height);
             },
 
-            "color" => {
+            BuiltInSymbol::Color => {
                 // NUM NUM NUM color, COLOR color
-                let pix = self.pop_as_color(tok)?;
+                let pix = self.pop_as_color("###")?;
                 self.push_color(pix);
             },
 
-            "image" => {
+            BuiltInSymbol::Image => {
                 // SIZE COLOR image, INT INT COLOR image
                 // SIZE NUM image, INT INT NUM image
                 let color: Pix<f32>;
                 
-                let colorval = self.pop(tok)?;
+                let colorval = self.pop("###")?;
                 match colorval {
                     StackValue::Color(pix) => {
                         color = pix;
@@ -132,7 +133,7 @@ impl ExecContext {
                     }
                 }
 
-                let (width, height) = self.pop_as_size(tok)?;
+                let (width, height) = self.pop_as_size("###")?;
                 
                 if width <= 0 || height <= 0 {
                     let msg = format!("image size must be positive: {width}x{height}");
@@ -143,73 +144,73 @@ impl ExecContext {
                 self.push_img(img);
             },
 
-            "write" => {
+            BuiltInSymbol::Write => {
                 // IMG STR write
-                let name: String = self.pop_str(tok)?;
-                let img: Rc<Img<f32>> = self.pop_img(tok)?;
+                let name: String = self.pop_str("###")?;
+                let img: Rc<Img<f32>> = self.pop_img("###")?;
                 ppmio::img_write(&name, img.as_u8())?;
             },
             
-            "read" => {
+            BuiltInSymbol::Read => {
                 // STR read
-                let name: String = self.pop_str(tok)?;
+                let name: String = self.pop_str("###")?;
                 let inimg = ppmio::img_read(&name)?;
                 self.push_img(inimg.as_f32());
             },
 
-            "+" => {
+            BuiltInSymbol::OpAdd => {
                 let varg2 = self.pop("+")?;
                 let varg1 = self.pop("+")?;
                 let stackval = elementwise(varg1, varg2, |v1, v2| v1+v2)?;
                 self.push(stackval);
             },
 
-            "-" => {
+            BuiltInSymbol::OpSub => {
                 let varg2 = self.pop("-")?;
                 let varg1 = self.pop("-")?;
                 let stackval = elementwise(varg1, varg2, |v1, v2| v1-v2)?;
                 self.push(stackval);
             },
 
-            "*" => {
+            BuiltInSymbol::OpMul => {
                 let varg2 = self.pop("*")?;
                 let varg1 = self.pop("*")?;
                 let stackval = elementwise(varg1, varg2, |v1, v2| v1*v2)?;
                 self.push(stackval);
             },
 
-            "/" => {
+            BuiltInSymbol::OpDiv => {
                 let varg2 = self.pop("/")?;
                 let varg1 = self.pop("/")?;
                 let stackval = elementwise(varg1, varg2, |v1, v2| v1/v2)?;
                 self.push(stackval);
             },
 
-            "average" => {
+            BuiltInSymbol::Average => {
                 // IMG contrast
-                let img: Rc<Img<f32>> = self.pop_img(tok)?;
+                let img: Rc<Img<f32>> = self.pop_img("###")?;
                 let pix = img.average();
                 self.push_color(pix);
             },
             
-            "contrast" => {
+            BuiltInSymbol::Contrast => {
                 // IMG NUM contrast
-                let val = self.pop_as_float(tok)?;
-                let img: Rc<Img<f32>> = self.pop_img(tok)?;
+                let val = self.pop_as_float("###")?;
+                let img: Rc<Img<f32>> = self.pop_img("###")?;
                 let res = img.contrast(val);
                 self.push_img(res);
             },
 
-            "halfshift" => {
-                let img: Rc<Img<f32>> = self.pop_img(tok)?;
+            BuiltInSymbol::HalfShift => {
+                let img: Rc<Img<f32>> = self.pop_img("###")?;
                 let res = img.halfshift();
                 self.push_img(res);
             },
 
-            "tileby" => {
+            BuiltInSymbol::TileBy => {
                 // IMG SIZE tileby, IMG NUM NUM tileby
-                let (width, height) = self.pop_as_size(tok)?;
-                let img: Rc<Img<f32>> = self.pop_img(tok)?;
+                let (width, height) = self.pop_as_size("###")?;
+                let img: Rc<Img<f32>> = self.pop_img("###")?;
                 if width <= 0 || height <= 0 {
                     let msg = format!("tileby size must be positive: {width}x{height}");
                     return Err(ExecError::new(&msg));
@@ -223,33 +224,28 @@ impl ExecContext {
                 self.push_img(res);
             },
 
-            "diamond" => {
+            BuiltInSymbol::Diamond => {
                 // SIZE diamond, etc
-                let (width, height) = self.pop_as_size(tok)?;
+                let (width, height) = self.pop_as_size("###")?;
                 let (uwidth, uheight) = (width as usize, height as usize);
                 let res : Img<f32> = Img::diamond(uwidth, uheight);
                 self.push_img(res);
             },
 
-            "holify" => {
+            BuiltInSymbol::Holify => {
                 // IMG NUM holify
-                let val = self.pop_as_float(tok)?;
-                let img: Rc<Img<f32>> = self.pop_img(tok)?;
+                let val = self.pop_as_float("###")?;
+                let img: Rc<Img<f32>> = self.pop_img("###")?;
                 let res = img.holify(val);
                 self.push_img(res);
             },
             
-            "taxiblur" => {
+            BuiltInSymbol::TaxiBlur => {
                 // IMG INT taxiblur
-                let val = self.pop_int(tok)?;
-                let img: Rc<Img<f32>> = self.pop_img(tok)?;
+                let val = self.pop_int("###")?;
+                let img: Rc<Img<f32>> = self.pop_img("###")?;
                 let res = img.taxiblur(val);
                 self.push_img(res);
-            },
-            
-            _ => {
-                let msg = format!("name not known: {:?}", tok);
-                return Err(ExecError::new(&msg));
             },
         }
         

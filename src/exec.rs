@@ -107,8 +107,12 @@ impl ExecContext {
                     if let Some(heapval) = self.heap.get(val) {
                         self.push(heapval.clone());
                     }
+                    else if let Some(symbol) = self.search_builtin(val) {
+                        self.execute_builtin(symbol)?;
+                    }
                     else {
-                        self.execute_builtin(val)?;
+                        let msg = format!("symbol not known: {:?}", val);
+                        return Err(ExecError::new(&msg));
                     }
                 },
                 ScriptToken::StoreTo(val) => {
