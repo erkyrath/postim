@@ -47,22 +47,20 @@ impl fmt::Debug for Script {
     }
 }
 
-pub struct TokenRefIter<'a, T: 'a> {
+pub struct TokenRefIter<T> {
     tokens: Rc<Vec<T>>,
     count: usize,
-    _marker: std::marker::PhantomData<&'a T>,
 }
 
-impl<'a, T> TokenRefIter<'a, T> {
-    fn new(tokens: Rc<Vec<T>>) -> TokenRefIter<'a, T> {
+impl<T> TokenRefIter<T> {
+    fn new(tokens: Rc<Vec<T>>) -> TokenRefIter<T> {
         TokenRefIter {
             tokens,
             count: 0,
-            _marker: std::marker::PhantomData,
         }
     }
 
-    fn next(&'a mut self) -> Option<&'a T> {
+    fn next<'a>(&'a mut self) -> Option<&'a T> {
         if self.count < self.tokens.len() {
             let oldcount = self.count;
             self.count += 1;
