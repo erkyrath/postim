@@ -35,10 +35,45 @@ impl Script {
     pub fn tokens(&self) -> &[ScriptToken] {
         return &self.tokens;
     }
+
+    pub fn tokeniter(&self) -> TokenRefIter<ScriptToken> {
+        return TokenRefIter::new(Rc::clone(&self.tokens));
+    }
 }
 
 impl fmt::Debug for Script {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "<Script \"{}\">", self.filename)
+    }
+}
+
+pub struct TokenRefIter<'a, T: 'a> {
+    tokens: Rc<Vec<T>>,
+    count: usize,
+    _marker: std::marker::PhantomData<&'a T>,
+}
+
+impl<'a, T> TokenRefIter<'a, T> {
+    fn new(tokens: Rc<Vec<T>>) -> TokenRefIter<'a, T> {
+        TokenRefIter {
+            tokens,
+            count: 0,
+            _marker: std::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, T> Iterator for TokenRefIter<'a, T> {
+    type Item = &'a T;
+
+    fn next(&mut self) -> Option<&'a T> {
+        if self.count < self.tokens.len() {
+            let oldcount = self.count;
+            self.count += 1;
+            Some(&self.tokens[oldcount])
+        }
+        else {
+            None
+        }
     }
 }
