@@ -28,7 +28,6 @@ pub enum StackValue {
 }
 
 pub struct ExecContext {
-    //###execstack: Vec<Rc<Vec<ScriptToken>>>,
     stack: Vec<StackValue>,
     heap: HashMap<String, StackValue>,
 }
@@ -36,7 +35,6 @@ pub struct ExecContext {
 impl ExecContext {
     pub fn new() -> ExecContext {
         ExecContext {
-            //###execstack: Vec::new(),
             stack: Vec::new(),
             heap: HashMap::new(),
         }
