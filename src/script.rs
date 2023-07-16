@@ -32,8 +32,8 @@ impl Script {
         }
     }
 
-    pub fn tokeniter(&self) -> TokenRefIter<ScriptToken> {
-        return TokenRefIter::new(&self.tokens);
+    pub fn tokens(&self) -> Rc<Vec<ScriptToken>> {
+        Rc::clone(&self.tokens)
     }
 }
 
@@ -43,31 +43,3 @@ impl fmt::Debug for Script {
     }
 }
 
-pub struct TokenRefIter<'a, T> {
-    tokens: &'a Rc<Vec<T>>,
-    count: usize,
-}
-
-impl<'a, T> TokenRefIter<'a, T> {
-    fn new(tokens: &'a Rc<Vec<T>>) -> TokenRefIter<'a, T> {
-        TokenRefIter {
-            tokens: tokens,
-            count: 0,
-        }
-    }
-}
-
-impl<'a, T> Iterator for TokenRefIter<'a, T> {
-    type Item = &'a T;
-    
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.count < self.tokens.len() {
-            let oldcount = self.count;
-            self.count += 1;
-            Some(&self.tokens[oldcount])
-        }
-        else {
-            None
-        }
-    }
-}

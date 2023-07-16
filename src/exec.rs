@@ -6,10 +6,12 @@ use crate::img::Img;
 use crate::script::Script;
 use crate::script::ScriptToken;
 use crate::exec::except::ExecError;
+use crate::exec::estack::LendStackIter;
 use crate::script::parse;
 use crate::img::ppmio;
 
 pub mod except;
+pub mod estack;
 pub mod pushpop;
 pub mod builtin;
 pub mod util;
@@ -26,7 +28,7 @@ pub enum StackValue {
 }
 
 pub struct ExecContext {
-    execstack: Vec<Rc<Vec<ScriptToken>>>,
+    //###execstack: Vec<Rc<Vec<ScriptToken>>>,
     stack: Vec<StackValue>,
     heap: HashMap<String, StackValue>,
 }
@@ -34,7 +36,7 @@ pub struct ExecContext {
 impl ExecContext {
     pub fn new() -> ExecContext {
         ExecContext {
-            execstack: Vec::new(),
+            //###execstack: Vec::new(),
             stack: Vec::new(),
             heap: HashMap::new(),
         }
@@ -79,7 +81,10 @@ impl ExecContext {
     }
 
     pub fn execute(&mut self, script: &Script) -> Result<(), ExecError> {
-        for tok in script.tokeniter() {
+        let execstack = LendStackIter::new(&script.tokens());
+
+        let temptemp = vec![ ScriptToken::Integer(1) ]; //###
+        for tok in &temptemp {
             match tok {
                 ScriptToken::Proc(proc) => {
                     self.push(StackValue::Proc(Rc::clone(proc)));
