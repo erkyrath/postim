@@ -60,7 +60,7 @@ impl<T> TokenRefIter<T> {
         }
     }
 
-    fn next<'a>(&'a mut self) -> Option<&'a T> {
+    pub fn next<'a>(&'a mut self) -> Option<&'a T> {
         if self.count < self.tokens.len() {
             let oldcount = self.count;
             self.count += 1;

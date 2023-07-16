@@ -79,7 +79,8 @@ impl ExecContext {
     }
 
     pub fn execute(&mut self, script: &Script) -> Result<(), ExecError> {
-        for tok in script.tokens() {
+        let mut iter = script.tokeniter();
+        while let Some(tok) = iter.next() {
             match tok {
                 ScriptToken::Proc(proc) => {
                     self.push(StackValue::Proc(Rc::clone(proc)));
