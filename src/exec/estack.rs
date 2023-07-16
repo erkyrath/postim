@@ -1,15 +1,15 @@
 use std::rc::Rc;
 
-struct LendIter<T> {
+struct LendIter<T: Clone> {
     items: Rc<Vec<T>>,
     count: usize,
 }
 
-pub struct LendStackIter<T> {
+pub struct LendStackIter<T: Clone> {
     stack: Vec<LendIter<T>>,
 }
 
-impl<T> LendStackIter<T> {
+impl<T: Clone> LendStackIter<T> {
     pub fn new(tokens: &Rc<Vec<T>>) -> LendStackIter<T> {
         let first = LendIter {
             items: Rc::clone(tokens),
@@ -20,13 +20,18 @@ impl<T> LendStackIter<T> {
         }
     }
 
-    fn next(&mut self) -> Option<&T> {
-        if self.stack.len() > 0 {
-            if self.stack[0].items.len() > 0 {
-                return Some(&self.stack[0].items[0]);
+    fn next(&mut self) -> Option<T> {
+        loop {
+            let last = self.stack.last_mut()?;  // or None
+            if last.count < last.items.len() {
+                let oldcount = last.count;
+                last.count += 1;
+                return Some(last.items[oldcount].clone());
+            }
+            else {
+                self.stack.pop();
             }
         }
-        None
     }
 }
 
