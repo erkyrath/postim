@@ -32,10 +32,6 @@ impl Script {
         }
     }
 
-    pub fn tokens(&self) -> &[ScriptToken] {
-        return &self.tokens;
-    }
-
     pub fn tokeniter(&self) -> TokenRefIter<ScriptToken> {
         return TokenRefIter::new(Rc::clone(&self.tokens));
     }
