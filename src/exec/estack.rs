@@ -23,17 +23,19 @@ impl<T> LendStackIter<T> {
     fn next(&mut self) -> Option<&T> {
         loop {
             let last = self.stack.last()?;  // or None
-            if last.count >= last.items.len() {
-                self.stack.pop();
-                continue;
+            if last.count < last.items.len() {
+                break;
             }
-
-            // Previous borrow had to be immutable, but now we need mutable.
-            let lastm = self.stack.last_mut()?;  // or None
-            let oldcount = lastm.count;
-            lastm.count += 1;
-            return Some(&lastm.items[oldcount]);
+            else {
+                self.stack.pop();
+            }
         }
+        
+        // Previous borrow had to be immutable, but now we need mutable.
+        let last = self.stack.last_mut()?;  // or None
+        let oldcount = last.count;
+        last.count += 1;
+        return Some(&last.items[oldcount]);
     }
 }
 
