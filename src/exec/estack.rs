@@ -24,6 +24,10 @@ impl<T> LendStackIter<T> {
         self.stack.push(frame);
     }
 
+    pub fn pop(&mut self) {
+        self.stack.pop();
+    }
+
     pub fn next(&mut self) -> Option<&T> {
         loop {
             let last = self.stack.last()?;  // or return None
