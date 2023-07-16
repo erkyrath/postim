@@ -108,7 +108,7 @@ impl ExecContext {
                         self.push(heapval.clone());
                     }
                     else if let Some(symbol) = self.search_builtin(val) {
-                        self.execute_builtin(symbol)?;
+                        self.execute_builtin(symbol, &mut execstack)?;
                     }
                     else {
                         let msg = format!("symbol not known: {:?}", val);

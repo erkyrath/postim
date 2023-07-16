@@ -3,8 +3,10 @@ use std::rc::Rc;
 use crate::pixel::Pix;
 use crate::img::Img;
 use crate::img::ppmio;
+use crate::script::ScriptToken;
 use crate::exec::StackValue;
 use crate::exec::ExecContext;
+use crate::exec::estack::LendStackIter;
 use crate::exec::except::ExecError;
 use crate::exec::util::elementwise;
 
@@ -59,7 +61,7 @@ impl ExecContext {
         }
     }
     
-    pub fn execute_builtin(&mut self, sym: BuiltInSymbol) -> Result<(), ExecError> {
+    pub fn execute_builtin(&mut self, sym: BuiltInSymbol, execstack: &mut LendStackIter<ScriptToken>) -> Result<(), ExecError> {
         match sym {
         
             BuiltInSymbol::Dup => {
