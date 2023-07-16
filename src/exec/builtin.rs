@@ -15,6 +15,7 @@ pub enum BuiltInSymbol {
     Dup,
     Pop,
     Swap,
+    Eval,
     If,
     IfElse,
     Split,
@@ -42,6 +43,7 @@ impl ExecContext {
             "dup" => Some(BuiltInSymbol::Dup),
             "pop" => Some(BuiltInSymbol::Pop),
             "swap" => Some(BuiltInSymbol::Swap),
+            "eval" => Some(BuiltInSymbol::Eval),
             "if" => Some(BuiltInSymbol::If),
             "ifelse" => Some(BuiltInSymbol::IfElse),
             "split" => Some(BuiltInSymbol::Split),
@@ -83,6 +85,36 @@ impl ExecContext {
                 let val2 = self.pop("swap")?;
                 self.push(val1);
                 self.push(val2);
+            },
+
+            BuiltInSymbol::Eval => {
+                let stackval = self.pop("eval")?;
+                match stackval {
+                    StackValue::Proc(proc) => {
+                        execstack.push(&proc);
+                    },
+                    StackValue::String(val) => {
+                        if let Some(heapval) = self.heap.get(&val) {
+                            if let StackValue::Proc(proc) = heapval {
+                                execstack.push(proc);
+                            }
+                            else {
+                                self.push(heapval.clone());
+                            }
+                        }
+                        else if let Some(symbol) = self.search_builtin(&val) {
+                            self.execute_builtin(symbol, execstack)?;
+                        }
+                        else {
+                            let msg = format!("symbol not known: {:?}", val);
+                            return Err(ExecError::new(&msg));
+                        }
+                    },
+                    _ => {
+                        let msg = format!("cannot eval: {:?}", stackval);
+                        return Err(ExecError::new(&msg));
+                    }                    
+                }
             },
 
             BuiltInSymbol::If => {
