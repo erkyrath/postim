@@ -81,7 +81,7 @@ impl ExecContext {
     }
 
     pub fn execute(&mut self, script: &Script) -> Result<(), ExecError> {
-        let execstack = LendStackIter::new(&script.tokens());
+        let _execstack = LendStackIter::new(&script.tokens());
 
         let temptemp = vec![ ScriptToken::Integer(1) ]; //###
         for tok in &temptemp {
