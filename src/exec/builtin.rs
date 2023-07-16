@@ -16,6 +16,7 @@ pub enum BuiltInSymbol {
     Pop,
     Swap,
     If,
+    IfElse,
     Split,
     Size,
     Color,
@@ -42,6 +43,7 @@ impl ExecContext {
             "pop" => Some(BuiltInSymbol::Pop),
             "swap" => Some(BuiltInSymbol::Swap),
             "if" => Some(BuiltInSymbol::If),
+            "ifelse" => Some(BuiltInSymbol::IfElse),
             "split" => Some(BuiltInSymbol::Split),
             "size" => Some(BuiltInSymbol::Size),
             "color" => Some(BuiltInSymbol::Color),
@@ -92,6 +94,28 @@ impl ExecContext {
                     }
                     else {
                         self.push(val);
+                    }
+                }
+            }
+            
+            BuiltInSymbol::IfElse => {
+                let flag = self.pop_int("ifelse")?;
+                let val2 = self.pop("ifelse")?;
+                let val1 = self.pop("ifelse")?;
+                if flag != 0 {
+                    if let StackValue::Proc(proc) = val1 {
+                        execstack.push(&proc);
+                    }
+                    else {
+                        self.push(val1);
+                    }
+                }
+                else {
+                    if let StackValue::Proc(proc) = val2 {
+                        execstack.push(&proc);
+                    }
+                    else {
+                        self.push(val2);
                     }
                 }
             }
