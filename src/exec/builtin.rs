@@ -277,10 +277,17 @@ impl ExecContext {
                 let mut subexecstack: LendStackIter<ScriptToken> = LendStackIter::new();
                 
                 let res = img.map_val_mut(|val: &f32| {
-                    subexecstack.push(&proc);
-                    subctx.popall();
-                    subctx.push_float(*val);
-                    0.0
+                    if let Err(_) = subctx.execute_proc(&proc, &mut subexecstack, StackValue::Float(*val)) {
+                        0.0
+                    }
+                    else {
+                        if let Ok(fval) = subctx.pop_float("mapval") {
+                            fval
+                        }
+                        else {
+                            0.0
+                        }
+                    }
                 });
                 self.push_img(res);
             },

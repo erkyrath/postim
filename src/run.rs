@@ -18,7 +18,7 @@ pub fn run(opts: &AppOptions) -> Result<(), Box<dyn Error>> {
     ctx.loadargs(&opts.infiles)?;
 
     for script in &scripts {
-        ctx.execute(&script)?;
+        ctx.execute_script(&script)?;
     }
 
     ctx.unloadargs(&opts.outfiles)?;

@@ -85,10 +85,20 @@ impl ExecContext {
         Ok(())
     }
 
-    pub fn execute(&mut self, script: &Script) -> Result<(), ExecError> {
+    pub fn execute_script(&mut self, script: &Script) -> Result<(), ExecError> {
         let mut execstack: LendStackIter<ScriptToken> = LendStackIter::new();
         execstack.push(&script.tokens());
+        self.execute(&mut execstack)
+    }
 
+    pub fn execute_proc(&mut self, proc: &Rc<Vec<ScriptToken>>, execstack: &mut LendStackIter<ScriptToken>, inval: StackValue) -> Result<(), ExecError> {
+        execstack.push(&proc);
+        self.popall();
+        self.push(inval);
+        self.execute(execstack)
+    }
+    
+    pub fn execute(&mut self, execstack: &mut LendStackIter<ScriptToken>) -> Result<(), ExecError> {
         while let Some(tok) = execstack.next() {
             match tok {
                 ScriptToken::Proc(proc) => {
@@ -120,7 +130,7 @@ impl ExecContext {
                         }
                     }
                     else if let Some(symbol) = self.search_builtin(val) {
-                        self.execute_builtin(symbol, &mut execstack)?;
+                        self.execute_builtin(symbol, execstack)?;
                     }
                     else {
                         let msg = format!("symbol not known: {:?}", val);
