@@ -61,12 +61,8 @@ impl<'a, T> TokenRefIter<'a, T> {
             _marker: std::marker::PhantomData,
         }
     }
-}
 
-impl<'a, T> Iterator for TokenRefIter<'a, T> {
-    type Item = &'a T;
-
-    fn next(&mut self) -> Option<&'a T> {
+    fn next(&'a mut self) -> Option<&'a T> {
         if self.count < self.tokens.len() {
             let oldcount = self.count;
             self.count += 1;
