@@ -71,19 +71,19 @@ impl ExecContext {
             },
             
             BuiltInSymbol::Pop => {
-                let _ = self.pop("###")?;
+                let _ = self.pop("pop")?;
             },
 
             BuiltInSymbol::Swap => {
-                let val1 = self.pop("###")?;
-                let val2 = self.pop("###")?;
+                let val1 = self.pop("swap")?;
+                let val2 = self.pop("swap")?;
                 self.push(val1);
                 self.push(val2);
             },
 
             BuiltInSymbol::Split => {
                 // COLOR split, SIZE split
-                let stackval = self.pop("###")?;
+                let stackval = self.pop("split")?;
                 match stackval {
                     StackValue::Size(xval, yval) => {
                         self.push_int(xval);
@@ -103,13 +103,13 @@ impl ExecContext {
 
             BuiltInSymbol::Size => {
                 // INT INT size, IMAGE size, SIZE size
-                let (width, height) = self.pop_as_size("###")?;
+                let (width, height) = self.pop_as_size("size")?;
                 self.push_size(width, height);
             },
 
             BuiltInSymbol::Color => {
                 // NUM NUM NUM color, COLOR color
-                let pix = self.pop_as_color("###")?;
+                let pix = self.pop_as_color("color")?;
                 self.push_color(pix);
             },
 
@@ -118,7 +118,7 @@ impl ExecContext {
                 // SIZE NUM image, INT INT NUM image
                 let color: Pix<f32>;
                 
-                let colorval = self.pop("###")?;
+                let colorval = self.pop("image")?;
                 match colorval {
                     StackValue::Color(pix) => {
                         color = pix;
@@ -135,7 +135,7 @@ impl ExecContext {
                     }
                 }
 
-                let (width, height) = self.pop_as_size("###")?;
+                let (width, height) = self.pop_as_size("image")?;
                 
                 if width <= 0 || height <= 0 {
                     let msg = format!("image size must be positive: {width}x{height}");
@@ -148,14 +148,14 @@ impl ExecContext {
 
             BuiltInSymbol::Write => {
                 // IMG STR write
-                let name: String = self.pop_str("###")?;
-                let img: Rc<Img<f32>> = self.pop_img("###")?;
+                let name: String = self.pop_str("write")?;
+                let img: Rc<Img<f32>> = self.pop_img("write")?;
                 ppmio::img_write(&name, img.as_u8())?;
             },
             
             BuiltInSymbol::Read => {
                 // STR read
-                let name: String = self.pop_str("###")?;
+                let name: String = self.pop_str("read")?;
                 let inimg = ppmio::img_read(&name)?;
                 self.push_img(inimg.as_f32());
             },
@@ -190,29 +190,29 @@ impl ExecContext {
 
             BuiltInSymbol::Average => {
                 // IMG contrast
-                let img: Rc<Img<f32>> = self.pop_img("###")?;
+                let img: Rc<Img<f32>> = self.pop_img("average")?;
                 let pix = img.average();
                 self.push_color(pix);
             },
             
             BuiltInSymbol::Contrast => {
                 // IMG NUM contrast
-                let val = self.pop_as_float("###")?;
-                let img: Rc<Img<f32>> = self.pop_img("###")?;
+                let val = self.pop_as_float("contrast")?;
+                let img: Rc<Img<f32>> = self.pop_img("contrast")?;
                 let res = img.contrast(val);
                 self.push_img(res);
             },
 
             BuiltInSymbol::HalfShift => {
-                let img: Rc<Img<f32>> = self.pop_img("###")?;
+                let img: Rc<Img<f32>> = self.pop_img("halfshift")?;
                 let res = img.halfshift();
                 self.push_img(res);
             },
 
             BuiltInSymbol::TileBy => {
                 // IMG SIZE tileby, IMG NUM NUM tileby
-                let (width, height) = self.pop_as_size("###")?;
-                let img: Rc<Img<f32>> = self.pop_img("###")?;
+                let (width, height) = self.pop_as_size("tileby")?;
+                let img: Rc<Img<f32>> = self.pop_img("tileby")?;
                 if width <= 0 || height <= 0 {
                     let msg = format!("tileby size must be positive: {width}x{height}");
                     return Err(ExecError::new(&msg));
@@ -228,7 +228,7 @@ impl ExecContext {
 
             BuiltInSymbol::Diamond => {
                 // SIZE diamond, etc
-                let (width, height) = self.pop_as_size("###")?;
+                let (width, height) = self.pop_as_size("diamond")?;
                 let (uwidth, uheight) = (width as usize, height as usize);
                 let res : Img<f32> = Img::diamond(uwidth, uheight);
                 self.push_img(res);
@@ -236,16 +236,16 @@ impl ExecContext {
 
             BuiltInSymbol::Holify => {
                 // IMG NUM holify
-                let val = self.pop_as_float("###")?;
-                let img: Rc<Img<f32>> = self.pop_img("###")?;
+                let val = self.pop_as_float("holify")?;
+                let img: Rc<Img<f32>> = self.pop_img("holify")?;
                 let res = img.holify(val);
                 self.push_img(res);
             },
             
             BuiltInSymbol::TaxiBlur => {
                 // IMG INT taxiblur
-                let val = self.pop_int("###")?;
-                let img: Rc<Img<f32>> = self.pop_img("###")?;
+                let val = self.pop_int("taxiblur")?;
+                let img: Rc<Img<f32>> = self.pop_img("taxiblur")?;
                 let res = img.taxiblur(val);
                 self.push_img(res);
             },
