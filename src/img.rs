@@ -116,8 +116,8 @@ impl<T: Clone> Img<T> {
         res
     }
 
-    pub fn map_mut<F>(&self, func: F) -> Result<Img<T>, ExecError>
-    where F: Fn(&Pix<T>) -> Result<Pix<T>, ExecError> {
+    pub fn map_mut<F>(&self, mut func: F) -> Result<Img<T>, ExecError>
+    where F: FnMut(&Pix<T>) -> Result<Pix<T>, ExecError> {
         let mut res = Img {
             width: self.width,
             height: self.height,

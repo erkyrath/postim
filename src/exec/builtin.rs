@@ -29,6 +29,7 @@ pub enum BuiltInSymbol {
     OpMul,
     OpDiv,
     Average,
+    Map,
     MapVal,
     Contrast,
     HalfShift,
@@ -58,6 +59,7 @@ impl ExecContext {
             "*" => Some(BuiltInSymbol::OpMul),
             "/" => Some(BuiltInSymbol::OpDiv),
             "average" => Some(BuiltInSymbol::Average),
+            "map" => Some(BuiltInSymbol::Map),
             "mapval" => Some(BuiltInSymbol::MapVal),
             "contrast" => Some(BuiltInSymbol::Contrast),
             "halfshift" => Some(BuiltInSymbol::HalfShift),
@@ -268,6 +270,22 @@ impl ExecContext {
                 self.push_color(pix);
             },
 
+            BuiltInSymbol::Map => {
+                // IMG PROC mapval
+                let proc = self.pop_proc("map")?;
+                let img: Rc<Img<f32>> = self.pop_img("map")?;
+                
+                let mut subctx = self.clone_env();
+                let mut subexecstack: LendStackIter<ScriptToken> = LendStackIter::new();
+                
+                let res = img.map_mut(|val: &Pix<f32>| {
+                    subctx.execute_proc(&proc, &mut subexecstack, StackValue::Color(val.clone()))?;
+                    let pval = subctx.pop_as_color("map")?;
+                    Ok(pval)
+                })?;
+                self.push_img(res);
+            },
+
             BuiltInSymbol::MapVal => {
                 // IMG PROC mapval
                 let proc = self.pop_proc("mapval")?;
@@ -278,7 +296,7 @@ impl ExecContext {
                 
                 let res = img.map_val_mut(|val: &f32| {
                     subctx.execute_proc(&proc, &mut subexecstack, StackValue::Float(*val))?;
-                    let fval = subctx.pop_float("mapval")?;
+                    let fval = subctx.pop_as_float("mapval")?;
                     Ok(fval)
                 })?;
                 self.push_img(res);
