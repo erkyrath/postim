@@ -2,6 +2,7 @@ use std::rc::Rc;
 
 use crate::pixel::Pix;
 use crate::img::Img;
+use crate::script::ScriptToken;
 use crate::exec::except::ExecError;
 use crate::exec::ExecContext;
 use crate::exec::StackValue;
@@ -49,6 +50,18 @@ impl ExecContext {
         }
         else {
             let msg = format!("{} needs str: {:?}", label, val);
+            Err(ExecError::new(&msg))
+        }
+    }
+
+    pub fn pop_proc(&mut self, label: &str) -> Result<Rc<Vec<ScriptToken>>, ExecError> {
+        let val = self.pop(label)?;
+        
+        if let StackValue::Proc(procval) = val {
+            Ok(procval)
+        }
+        else {
+            let msg = format!("{} needs proc: {:?}", label, val);
             Err(ExecError::new(&msg))
         }
     }
