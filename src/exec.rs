@@ -81,7 +81,8 @@ impl ExecContext {
     }
 
     pub fn execute(&mut self, script: &Script) -> Result<(), ExecError> {
-        let mut execstack = LendStackIter::new(&script.tokens());
+        let mut execstack = LendStackIter::new();
+        execstack.push(&script.tokens());
 
         while let Some(tok) = execstack.next() {
             match tok {

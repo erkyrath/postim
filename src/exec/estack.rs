@@ -10,14 +10,18 @@ pub struct LendStackIter<T> {
 }
 
 impl<T> LendStackIter<T> {
-    pub fn new(tokens: &Rc<Vec<T>>) -> LendStackIter<T> {
-        let first = LendIter {
+    pub fn new() -> LendStackIter<T> {
+        LendStackIter {
+            stack: Vec::new(),
+        }
+    }
+
+    pub fn push(&mut self, tokens: &Rc<Vec<T>>) {
+        let frame = LendIter {
             items: Rc::clone(tokens),
             count: 0,
         };
-        LendStackIter {
-            stack: vec![ first ],
-        }
+        self.stack.push(frame);
     }
 
     pub fn next(&mut self) -> Option<&T> {
