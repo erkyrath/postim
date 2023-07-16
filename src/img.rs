@@ -116,6 +116,21 @@ impl<T: Clone> Img<T> {
         res
     }
 
+    pub fn map_mut<F>(&self, func: F) -> Result<Img<T>, ExecError>
+    where F: Fn(&Pix<T>) -> Result<Pix<T>, ExecError> {
+        let mut res = Img {
+            width: self.width,
+            height: self.height,
+            pixels: Vec::with_capacity(self.pixcount()),
+        };
+
+        for val in &self.pixels {
+            res.pixels.push(func(val)?);
+        }
+
+        Ok(res)
+    }
+
     pub fn combine<F>(&self, other: &Img<T>, func: F) -> Img<T>
     where F: Fn(&Pix<T>, &Pix<T>) -> Pix<T> {
         assert!(self.width == other.width);
