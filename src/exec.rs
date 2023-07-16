@@ -40,6 +40,13 @@ impl ExecContext {
         }
     }
 
+    pub fn clone_env(&self) -> ExecContext {
+        ExecContext {
+            stack: Vec::new(),
+            heap: self.heap.clone(),
+        }
+    }
+
     pub fn stack(&self) -> &[StackValue] {
         &self.stack
     }
