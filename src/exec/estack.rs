@@ -28,6 +28,7 @@ impl<T> LendStackIter<T> {
                 continue;
             }
 
+            // Previous borrow had to be immutable, but now we need mutable.
             let lastm = self.stack.last_mut()?;  // or None
             let oldcount = lastm.count;
             lastm.count += 1;
