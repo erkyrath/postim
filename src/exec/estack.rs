@@ -20,7 +20,7 @@ impl<T> LendStackIter<T> {
         }
     }
 
-    fn next(&mut self) -> Option<&T> {
+    pub fn next(&mut self) -> Option<&T> {
         loop {
             let last = self.stack.last()?;  // or return None
             if last.count < last.items.len() {
