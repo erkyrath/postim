@@ -105,7 +105,12 @@ impl ExecContext {
                 },
                 ScriptToken::Name(val) => {
                     if let Some(heapval) = self.heap.get(val) {
-                        self.push(heapval.clone());
+                        if let StackValue::Proc(proc) = heapval {
+                            execstack.push(proc);
+                        }
+                        else {
+                            self.push(heapval.clone());
+                        }
                     }
                     else if let Some(symbol) = self.search_builtin(val) {
                         self.execute_builtin(symbol, &mut execstack)?;
