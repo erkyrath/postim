@@ -1,6 +1,7 @@
 use std::fmt;
 
 use crate::pixel::Pix;
+use crate::exec::except::ExecError;
 
 pub mod imgmath;
 pub mod ppmio;
@@ -84,8 +85,8 @@ impl<T: Clone> Img<T> {
         res
     }
 
-    pub fn map_val_mut<F>(&self, mut func: F) -> Img<T>
-    where F: FnMut(&T) -> T {
+    pub fn map_val_mut<F>(&self, mut func: F) -> Result<Img<T>, ExecError>
+    where F: FnMut(&T) -> Result<T, ExecError> {
         let mut res = Img {
             width: self.width,
             height: self.height,
@@ -93,11 +94,11 @@ impl<T: Clone> Img<T> {
         };
 
         for val in &self.pixels {
-            let pix = Pix { r:func(&val.r), g:func(&val.g), b:func(&val.b) };
+            let pix = Pix { r:func(&val.r)?, g:func(&val.g)?, b:func(&val.b)? };
             res.pixels.push(pix);
         }
 
-        res
+        Ok(res)
     }
 
     pub fn map<F>(&self, func: F) -> Img<T>
