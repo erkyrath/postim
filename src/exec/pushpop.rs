@@ -9,6 +9,10 @@ use crate::exec::StackValue;
 
 impl ExecContext {
 
+    pub fn popall(&mut self) {
+        self.stack.clear();
+    }
+    
     pub fn pop(&mut self, label: &str) -> Result<StackValue, ExecError> {
         let val = self.stack.pop()
             .ok_or_else(|| {

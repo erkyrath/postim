@@ -84,6 +84,22 @@ impl<T: Clone> Img<T> {
         res
     }
 
+    pub fn map_val_mut<F>(&self, mut func: F) -> Img<T>
+    where F: FnMut(&T) -> T {
+        let mut res = Img {
+            width: self.width,
+            height: self.height,
+            pixels: Vec::with_capacity(self.pixcount()),
+        };
+
+        for val in &self.pixels {
+            let pix = Pix { r:func(&val.r), g:func(&val.g), b:func(&val.b) };
+            res.pixels.push(pix);
+        }
+
+        res
+    }
+
     pub fn map<F>(&self, func: F) -> Img<T>
     where F: Fn(&Pix<T>) -> Pix<T> {
         let mut res = Img {

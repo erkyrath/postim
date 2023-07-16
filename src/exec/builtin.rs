@@ -29,6 +29,7 @@ pub enum BuiltInSymbol {
     OpMul,
     OpDiv,
     Average,
+    MapVal,
     Contrast,
     HalfShift,
     TileBy,
@@ -57,6 +58,7 @@ impl ExecContext {
             "*" => Some(BuiltInSymbol::OpMul),
             "/" => Some(BuiltInSymbol::OpDiv),
             "average" => Some(BuiltInSymbol::Average),
+            "mapval" => Some(BuiltInSymbol::MapVal),
             "contrast" => Some(BuiltInSymbol::Contrast),
             "halfshift" => Some(BuiltInSymbol::HalfShift),
             "tileby" => Some(BuiltInSymbol::TileBy),
@@ -265,7 +267,24 @@ impl ExecContext {
                 let pix = img.average();
                 self.push_color(pix);
             },
-            
+
+            BuiltInSymbol::MapVal => {
+                // IMG PROC mapval
+                let proc = self.pop_proc("mapval")?;
+                let img: Rc<Img<f32>> = self.pop_img("mapval")?;
+                
+                let mut subctx = self.clone_env();
+                let mut subexecstack: LendStackIter<ScriptToken> = LendStackIter::new();
+                
+                let res = img.map_val_mut(|val: &f32| {
+                    subexecstack.push(&proc);
+                    subctx.popall();
+                    subctx.push_float(*val);
+                    0.0
+                });
+                self.push_img(res);
+            },
+
             BuiltInSymbol::Contrast => {
                 // IMG NUM contrast
                 let val = self.pop_as_float("contrast")?;
