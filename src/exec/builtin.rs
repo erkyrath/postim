@@ -8,7 +8,56 @@ use crate::exec::ExecContext;
 use crate::exec::except::ExecError;
 use crate::exec::util::elementwise;
 
+pub enum BuiltInSymbol {
+    Dup,
+    Pop,
+    Swap,
+    Split,
+    Size,
+    Color,
+    Image,
+    Write,
+    Read,
+    OpAdd,
+    OpSub,
+    OpMul,
+    OpDiv,
+    Average,
+    Contrast,
+    HalfShift,
+    TileBy,
+    Diamond,
+    Holify,
+    TaxiBlur,
+}
+
 impl ExecContext {
+    pub fn search_builtin(&self, tok: &str) -> Option<BuiltInSymbol> {
+        match tok {
+            "dup" => Some(BuiltInSymbol::Dup),
+            "pop" => Some(BuiltInSymbol::Pop),
+            "swap" => Some(BuiltInSymbol::Swap),
+            "split" => Some(BuiltInSymbol::Split),
+            "size" => Some(BuiltInSymbol::Size),
+            "color" => Some(BuiltInSymbol::Color),
+            "image" => Some(BuiltInSymbol::Image),
+            "write" => Some(BuiltInSymbol::Write),
+            "read" => Some(BuiltInSymbol::Read),
+            "+" => Some(BuiltInSymbol::OpAdd),
+            "-" => Some(BuiltInSymbol::OpSub),
+            "*" => Some(BuiltInSymbol::OpMul),
+            "/" => Some(BuiltInSymbol::OpDiv),
+            "average" => Some(BuiltInSymbol::Average),
+            "contrast" => Some(BuiltInSymbol::Contrast),
+            "halfshift" => Some(BuiltInSymbol::HalfShift),
+            "tileby" => Some(BuiltInSymbol::TileBy),
+            "diamond" => Some(BuiltInSymbol::Diamond),
+            "holify" => Some(BuiltInSymbol::Holify),
+            "taxiblur" => Some(BuiltInSymbol::TaxiBlur),
+            _ => None,
+        }
+    }
+    
     pub fn execute_builtin(&mut self, tok: &str) -> Result<(), ExecError> {
         match tok {
         
