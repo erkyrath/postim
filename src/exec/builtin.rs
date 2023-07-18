@@ -486,14 +486,12 @@ impl ExecContext {
                 
                 let mut subctx = self.clone_env();
                 let mut subexecstack: LendStackIter<ScriptToken> = LendStackIter::new();
-                
-                let res = img.project_map_mut(|px, py| {
-                    subctx.execute_proc_2(&locproc, &mut subexecstack, StackValue::Float(px), StackValue::Float(py))?;
+                let res = Img::new_func_mut(img.width, img.height, |px, py| {
+                    subctx.execute_proc_2(&locproc, &mut subexecstack, StackValue::Float(px * img.width as f32), StackValue::Float(py * img.height as f32))?;
                     let yval = subctx.pop_as_float("projectmap locproc")?;
                     let xval = subctx.pop_as_float("projectmap locproc")?;
-                    Ok((xval, yval))
-                }, |val| {
-                    subctx.execute_proc(&pixproc, &mut subexecstack, StackValue::Color(val.clone()))?;
+                    let pix = img.at_lerp(xval, yval);
+                    subctx.execute_proc(&pixproc, &mut subexecstack, StackValue::Color(pix.clone()))?;
                     let pval = subctx.pop_as_color("projectmap pixproc")?;
                     Ok(pval)
                 })?;
