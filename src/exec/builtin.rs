@@ -8,6 +8,7 @@ use crate::exec::StackValue;
 use crate::exec::ExecContext;
 use crate::exec::estack::LendStackIter;
 use crate::exec::except::ExecError;
+use crate::exec::util::elementwise;
 use crate::exec::util::elementwise_2;
 
 #[derive(Debug, Clone)]
@@ -24,6 +25,7 @@ pub enum BuiltInSymbol {
     Image,
     Write,
     Read,
+    Sin,
     OpAdd,
     OpSub,
     OpMul,
@@ -56,6 +58,7 @@ impl ExecContext {
             "image" => Some(BuiltInSymbol::Image),
             "write" => Some(BuiltInSymbol::Write),
             "read" => Some(BuiltInSymbol::Read),
+            "sin" => Some(BuiltInSymbol::Sin),
             "+" => Some(BuiltInSymbol::OpAdd),
             "-" => Some(BuiltInSymbol::OpSub),
             "*" => Some(BuiltInSymbol::OpMul),
@@ -259,6 +262,12 @@ impl ExecContext {
                 let name: String = self.pop_str("read")?;
                 let inimg = ppmio::img_read(&name)?;
                 self.push_img(inimg.as_f32());
+            },
+
+            BuiltInSymbol::Sin => {
+                let varg = self.pop("sin")?;
+                let stackval = elementwise(varg, |val| val.sin())?;
+                self.push(stackval);                
             },
 
             BuiltInSymbol::OpAdd => {
