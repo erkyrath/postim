@@ -413,6 +413,7 @@ impl ExecContext {
 
             BuiltInSymbol::Project => {
                 // IMG PROC project
+                //### or IMG IMG project?
                 let proc = self.pop_proc("project")?;
                 let img: Rc<Img<f32>> = self.pop_img("project")?;
                 
