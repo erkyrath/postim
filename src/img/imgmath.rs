@@ -78,6 +78,21 @@ impl Img<f32> {
         res
     }
 
+    pub fn project_map_mut<F, G>(&self, mut lfunc: F, mut pfunc: G) -> Result<Img<f32>, ExecError>
+    where F: FnMut(f32, f32) -> Result<(f32, f32), ExecError>,
+          G: FnMut(&Pix<f32>) -> Result<Pix<f32>, ExecError> {
+        let mut res = Img::new(self.width, self.height);
+        for jx in 0..self.height {
+            for ix in 0..self.width {
+                let (newx, newy) = lfunc(ix as f32, jx as f32)?;
+                let pix = self.at_lerp(newx, newy);
+                let pix2 = pfunc(&pix)?;
+                res.set(ix, jx, pix2);
+            }
+        }
+        Ok(res)
+    }
+
     pub fn interp_mask(&self, other: &Img<f32>, mask: &Img<f32>) -> Img<f32> {
         assert!(self.width == other.width);
         assert!(self.height == other.height);
