@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::pixel::Pix;
+use crate::img::pixel::Pix;
 use crate::img::Img;
 use crate::exec::StackValue;
 use crate::exec::except::ExecError;

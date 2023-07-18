@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use crate::pixel::Pix;
+use crate::img::pixel::Pix;
 use crate::img::Img;
 use crate::script::Script;
 use crate::script::ScriptToken;

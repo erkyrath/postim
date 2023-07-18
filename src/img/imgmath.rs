@@ -1,4 +1,4 @@
-use crate::pixel::Pix;
+use crate::img::pixel::Pix;
 use crate::img::Img;
 use crate::exec::except::ExecError;
 

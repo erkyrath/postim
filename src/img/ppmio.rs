@@ -4,7 +4,7 @@ use std::error::Error;
 use std::io::Read;
 use std::io::Write;
 
-use crate::pixel::Pix;
+use crate::img::pixel::Pix;
 use crate::img::Img;
 
 fn read_line(fl: &mut fs::File) -> Option<String> {

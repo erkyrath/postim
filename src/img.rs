@@ -1,8 +1,9 @@
 use std::fmt;
 
-use crate::pixel::Pix;
+use crate::img::pixel::Pix;
 use crate::exec::except::ExecError;
 
+pub mod pixel;
 pub mod imgmath;
 pub mod ppmio;
 

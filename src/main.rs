@@ -6,7 +6,6 @@ use gumdrop::Options;
 mod run;
 mod script;
 mod exec;
-mod pixel;
 mod img;
 
 #[derive(Options, Debug)]
