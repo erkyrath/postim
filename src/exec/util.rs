@@ -5,6 +5,28 @@ use crate::img::Img;
 use crate::exec::StackValue;
 use crate::exec::except::ExecError;
 
+pub fn elementwise<F>(arg: StackValue, func: F) -> Result<StackValue, ExecError>
+    where F: Fn(&f32) -> f32 {
+    
+    match arg {
+        StackValue::Float(f1) => {
+            Ok(StackValue::Float(func(&f1)))
+        },
+        StackValue::Color(p1) => {
+            let res: Pix<f32> = Pix::new(func(&p1.r), func(&p1.g), func(&p1.b));
+            Ok(StackValue::Color(res))
+        },
+        StackValue::Image(img1) => {
+            let res = img1.map_val(func);
+            Ok(StackValue::Image(Rc::new(res)))
+        },
+        xarg1 => {
+            let msg = format!("no arithmetic operation: {:?}", xarg1);
+            Err(ExecError::new(&msg))
+        }
+    }
+}
+
 pub fn elementwise_2<F>(varg1: StackValue, varg2: StackValue, func: F) -> Result<StackValue, ExecError>
     where F: Fn(&f32, &f32) -> f32 {
     
