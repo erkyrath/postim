@@ -9,6 +9,9 @@ pub fn elementwise<F>(arg: StackValue, func: F) -> Result<StackValue, ExecError>
     where F: Fn(&f32) -> f32 {
     
     match arg {
+        StackValue::Integer(i1) => {
+            Ok(StackValue::Float(func(&(i1 as f32))))
+        },
         StackValue::Float(f1) => {
             Ok(StackValue::Float(func(&f1)))
         },
