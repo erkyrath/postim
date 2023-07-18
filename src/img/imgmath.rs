@@ -1,5 +1,6 @@
 use crate::pixel::Pix;
 use crate::img::Img;
+use crate::exec::except::ExecError;
 
 impl Img<f32> {
 
@@ -41,17 +42,17 @@ impl Img<f32> {
         res
     }
     
-    pub fn project<F>(&self, func: F) -> Img<f32>
-    where F: Fn(f32, f32) -> (f32, f32) {
+    pub fn project_mut<F>(&self, mut func: F) -> Result<Img<f32>, ExecError>
+    where F: FnMut(f32, f32) -> Result<(f32, f32), ExecError> {
         let mut res = Img::new(self.width, self.height);
         for jx in 0..self.height {
             for ix in 0..self.width {
-                let newpos = func(ix as f32, jx as f32);
+                let newpos = func(ix as f32, jx as f32)?;
                 let pix = self.at_lerp(newpos.0, newpos.1);
                 res.set(ix, jx, pix);
             }
         }
-        res
+        Ok(res)
     }
     
     pub fn project_shade<F>(&self, func: F) -> Img<f32>
