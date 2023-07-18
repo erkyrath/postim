@@ -43,7 +43,7 @@ impl<T: Default + Clone> Img<T> {
         res
     }
 
-    pub fn new_func<F>(width: usize, height: usize, mut func: F) -> Result<Img<T>, ExecError>
+    pub fn new_func_mut<F>(width: usize, height: usize, mut func: F) -> Result<Img<T>, ExecError>
     where F: FnMut(f32, f32) -> Result<Pix<T>, ExecError> {
         let mut res = Img::new(width, height);
 

@@ -248,7 +248,7 @@ impl ExecContext {
                     StackValue::Proc(proc) => {
                         let mut subctx = self.clone_env();
                         let mut subexecstack: LendStackIter<ScriptToken> = LendStackIter::new();
-                        img = Img::new_func(width as usize, height as usize, |px, py| {
+                        img = Img::new_func_mut(width as usize, height as usize, |px, py| {
                             subctx.execute_proc_2(&proc, &mut subexecstack, StackValue::Float(px), StackValue::Float(py))?;
                             let pval = subctx.pop_as_color("image proc")?;
                             Ok(pval)
