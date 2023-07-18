@@ -9,22 +9,22 @@ pub fn elementwise<F>(arg: StackValue, func: F) -> Result<StackValue, ExecError>
     where F: Fn(&f32) -> f32 {
     
     match arg {
-        StackValue::Integer(i1) => {
-            Ok(StackValue::Float(func(&(i1 as f32))))
+        StackValue::Integer(ival) => {
+            Ok(StackValue::Float(func(&(ival as f32))))
         },
-        StackValue::Float(f1) => {
-            Ok(StackValue::Float(func(&f1)))
+        StackValue::Float(fval) => {
+            Ok(StackValue::Float(func(&fval)))
         },
-        StackValue::Color(p1) => {
-            let res: Pix<f32> = Pix::new(func(&p1.r), func(&p1.g), func(&p1.b));
+        StackValue::Color(pval) => {
+            let res: Pix<f32> = Pix::new(func(&pval.r), func(&pval.g), func(&pval.b));
             Ok(StackValue::Color(res))
         },
-        StackValue::Image(img1) => {
-            let res = img1.map_val(func);
+        StackValue::Image(img) => {
+            let res = img.map_val(func);
             Ok(StackValue::Image(Rc::new(res)))
         },
-        xarg1 => {
-            let msg = format!("no arithmetic operation: {:?}", xarg1);
+        _ => {
+            let msg = format!("no arithmetic operation: {:?}", arg);
             Err(ExecError::new(&msg))
         }
     }
