@@ -1,0 +1,21 @@
+
+>> th  >>img
+
+
+th cos >>thcos
+th sin >>thsin
+
+img size split 0.5 * >>halfheight 0.5 * >> halfwidth
+
+img {
+  halfheight - >>yval
+  halfwidth - >>xval
+  thcos xval * thsin yval * + halfwidth +
+  thcos yval * thsin xval * - halfheight +
+} project
+
+
+
+
+
+

@@ -1,0 +1,31 @@
+
+>> rad  >>img
+
+img size split 0.5 * >>halfheight 0.5 * >> halfwidth
+
+img {
+  halfheight - >>ypc
+  halfwidth - >>xpc
+  
+  xpc ypc hypot >>dist
+  xpc dist / >>xvec
+  ypc dist / >>yvec
+  {
+    0.0
+    xpc halfwidth +  ypc halfheight +
+  } {
+    rad dist - 2.0 * rad / >>dist
+    xvec yvec + dist * >>mshade
+    rad  dist asin rad *  - >>dist
+    {
+      0.0
+      dist dist
+    } {
+      0.5 mshade *
+      xvec dist * halfwidth +  yvec dist * halfheight +
+    } dist isnan ifelse
+  } dist rad >= ifelse
+} {
+  swap shade
+} projectmap
+
