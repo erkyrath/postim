@@ -5,7 +5,7 @@ use crate::img::Img;
 use crate::exec::StackValue;
 use crate::exec::except::ExecError;
 
-pub fn elementwise<F>(varg1: StackValue, varg2: StackValue, func: F) -> Result<StackValue, ExecError>
+pub fn elementwise_2<F>(varg1: StackValue, varg2: StackValue, func: F) -> Result<StackValue, ExecError>
     where F: Fn(&f32, &f32) -> f32 {
     
     let arg2 = if let StackValue::Integer(ival) = varg2 {

@@ -8,7 +8,7 @@ use crate::exec::StackValue;
 use crate::exec::ExecContext;
 use crate::exec::estack::LendStackIter;
 use crate::exec::except::ExecError;
-use crate::exec::util::elementwise;
+use crate::exec::util::elementwise_2;
 
 #[derive(Debug, Clone)]
 pub enum BuiltInSymbol {
@@ -264,35 +264,35 @@ impl ExecContext {
             BuiltInSymbol::OpAdd => {
                 let varg2 = self.pop("+")?;
                 let varg1 = self.pop("+")?;
-                let stackval = elementwise(varg1, varg2, |v1, v2| v1+v2)?;
+                let stackval = elementwise_2(varg1, varg2, |v1, v2| v1+v2)?;
                 self.push(stackval);
             },
 
             BuiltInSymbol::OpSub => {
                 let varg2 = self.pop("-")?;
                 let varg1 = self.pop("-")?;
-                let stackval = elementwise(varg1, varg2, |v1, v2| v1-v2)?;
+                let stackval = elementwise_2(varg1, varg2, |v1, v2| v1-v2)?;
                 self.push(stackval);
             },
 
             BuiltInSymbol::OpMul => {
                 let varg2 = self.pop("*")?;
                 let varg1 = self.pop("*")?;
-                let stackval = elementwise(varg1, varg2, |v1, v2| v1*v2)?;
+                let stackval = elementwise_2(varg1, varg2, |v1, v2| v1*v2)?;
                 self.push(stackval);
             },
 
             BuiltInSymbol::OpDiv => {
                 let varg2 = self.pop("/")?;
                 let varg1 = self.pop("/")?;
-                let stackval = elementwise(varg1, varg2, |v1, v2| v1/v2)?;
+                let stackval = elementwise_2(varg1, varg2, |v1, v2| v1/v2)?;
                 self.push(stackval);
             },
 
             BuiltInSymbol::Shade => {
                 let varg2 = self.pop("shade")?;
                 let varg1 = self.pop("shade")?;
-                let stackval = elementwise(varg1, varg2, |v1, vshade| {
+                let stackval = elementwise_2(varg1, varg2, |v1, vshade| {
                     if vshade >= &0.0 {
                         (1.0-vshade) * v1 + (vshade) * 255.0
                     }
@@ -306,7 +306,7 @@ impl ExecContext {
             BuiltInSymbol::Sigmoid => {
                 let varg2 = self.pop("sigmoid")?;
                 let varg1 = self.pop("sigmoid")?;
-                let stackval = elementwise(varg1, varg2, |val, vsharp| {
+                let stackval = elementwise_2(varg1, varg2, |val, vsharp| {
                     1.0 / (1.0 + (-vsharp*(2.0*val-1.0)).exp())
                 })?;
                 self.push(stackval);
