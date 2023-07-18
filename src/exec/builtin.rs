@@ -26,6 +26,11 @@ pub enum BuiltInSymbol {
     Write,
     Read,
     Sin,
+    Cos,
+    Tan,
+    ASin,
+    ACos,
+    ATan,
     OpAdd,
     OpSub,
     OpMul,
@@ -59,6 +64,11 @@ impl ExecContext {
             "write" => Some(BuiltInSymbol::Write),
             "read" => Some(BuiltInSymbol::Read),
             "sin" => Some(BuiltInSymbol::Sin),
+            "cos" => Some(BuiltInSymbol::Cos),
+            "tan" => Some(BuiltInSymbol::Tan),
+            "asin" => Some(BuiltInSymbol::ASin),
+            "acos" => Some(BuiltInSymbol::ACos),
+            "atan" => Some(BuiltInSymbol::ATan),
             "+" => Some(BuiltInSymbol::OpAdd),
             "-" => Some(BuiltInSymbol::OpSub),
             "*" => Some(BuiltInSymbol::OpMul),
@@ -268,6 +278,36 @@ impl ExecContext {
                 let varg = self.pop("sin")?;
                 let stackval = elementwise(varg, |val| val.sin())?;
                 self.push(stackval);                
+            },
+
+            BuiltInSymbol::Cos => {
+                let varg = self.pop("cos")?;
+                let stackval = elementwise(varg, |val| val.cos())?;
+                self.push(stackval);                
+            },
+
+            BuiltInSymbol::Tan => {
+                let varg = self.pop("tan")?;
+                let stackval = elementwise(varg, |val| val.tan())?;
+                self.push(stackval);                
+            },
+
+            BuiltInSymbol::ASin => {
+                let varg = self.pop("asin")?;
+                let stackval = elementwise(varg, |val| val.asin())?;
+                self.push(stackval);                
+            },
+
+            BuiltInSymbol::ACos => {
+                let varg = self.pop("acos")?;
+                let stackval = elementwise(varg, |val| val.acos())?;
+                self.push(stackval);                
+            },
+
+            BuiltInSymbol::ATan => {
+                let varg = self.pop("atan")?;
+                let stackval = elementwise(varg, |val| val.atan())?;
+                self.push(stackval);
             },
 
             BuiltInSymbol::OpAdd => {
