@@ -193,23 +193,27 @@ impl ExecContext {
             BuiltInSymbol::Image => {
                 // SIZE COLOR image, INT INT COLOR image
                 // SIZE NUM image, INT INT NUM image
-                let color: Pix<f32>;
+                // SIZE PROC image, INT INT PROC image
+                let color: StackValue;
                 
                 let colorval = self.pop("image")?;
                 match colorval {
                     StackValue::Color(pix) => {
-                        color = pix;
+                        color = StackValue::Color(pix);
                     },
                     StackValue::Integer(ival) => {
-                        color = Pix::grey(ival as f32);
+                        color = StackValue::Color(Pix::grey(ival as f32));
                     },
                     StackValue::Float(fval) => {
-                        color = Pix::grey(fval);
+                        color = StackValue::Color(Pix::grey(fval));
+                    },
+                    StackValue::Proc(pval) => {
+                        color = StackValue::Proc(pval);
                     },
                     _ => {
-                        let msg = format!("image needs color or num: {:?}", colorval);
+                        let msg = format!("image needs color, num, or proc: {:?}", colorval);
                         return Err(ExecError::new(&msg));
-                    }
+                    },
                 }
 
                 let (width, height) = self.pop_as_size("image")?;
@@ -218,8 +222,26 @@ impl ExecContext {
                     let msg = format!("image size must be positive: {width}x{height}");
                     return Err(ExecError::new(&msg));
                 }
-                
-                let img = Img::new_constant(width as usize, height as usize, color);
+
+                let img: Img<f32>;
+                match color {
+                    StackValue::Color(pix) => {
+                        img = Img::new_constant(width as usize, height as usize, pix);
+                    },
+                    StackValue::Proc(proc) => {
+                        let mut subctx = self.clone_env();
+                        let mut subexecstack: LendStackIter<ScriptToken> = LendStackIter::new();
+                        img = Img::new_func(width as usize, height as usize, |px, py| {
+                            subctx.execute_proc_2(&proc, &mut subexecstack, StackValue::Float(px), StackValue::Float(py))?;
+                            let pval = subctx.pop_as_color("image proc")?;
+                            Ok(pval)
+                        })?;
+                    },
+                    _ => {
+                        let msg = format!("should not have generated color: {:?}", color);
+                        return Err(ExecError::new(&msg));
+                    },
+                }
                 self.push_img(img);
             },
 
@@ -296,7 +318,7 @@ impl ExecContext {
                 
                 let res = img.map_mut(|val: &Pix<f32>| {
                     subctx.execute_proc(&proc, &mut subexecstack, StackValue::Color(val.clone()))?;
-                    let pval = subctx.pop_as_color("map")?;
+                    let pval = subctx.pop_as_color("map proc")?;
                     Ok(pval)
                 })?;
                 self.push_img(res);
