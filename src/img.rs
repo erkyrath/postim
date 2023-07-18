@@ -44,6 +44,21 @@ impl<T: Default + Clone> Img<T> {
         res
     }
 
+    pub fn new_func<F>(width: usize, height: usize, func: F) -> Img<T>
+    where F: Fn(f32, f32) -> Pix<T> {
+        let mut res = Img::new(width, height);
+
+        for jx in 0..height {
+            let jval = (jx as f32) / (height as f32);
+            for ix in 0..width {
+                let ival = (ix as f32) / (width as f32);
+                res.set(ix, jx, func(ival, jval));
+            }
+        }
+        
+        res
+    }
+
     pub fn new_func_mut<F>(width: usize, height: usize, mut func: F) -> Result<Img<T>, ExecError>
     where F: FnMut(f32, f32) -> Result<Pix<T>, ExecError> {
         let mut res = Img::new(width, height);

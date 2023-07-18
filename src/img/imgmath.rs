@@ -164,22 +164,40 @@ impl Img<f32> {
     pub fn holify(&self, rad: f32) -> Img<f32> {
         let halfwidth = (self.width/2) as f32;
         let halfheight = (self.height/2) as f32;
-        let res = self.project_shade(|xp, yp| {
-            let xpc = xp - halfwidth;
-            let ypc = yp - halfheight;
+        let res = Img::new_func(self.width, self.height, |xp, yp| {
+            let xpc = xp * self.width as f32 - halfwidth;
+            let ypc = yp * self.height as f32 - halfheight;
             let mut dist = xpc.hypot(ypc);
             let xvec = xpc / dist;
             let yvec = ypc / dist;
+            let mut pix;
+            let mut mshade: f32 = 0.0;
             if dist >= rad {
-                return (xp, yp, 0.0)
+                pix = self.at_lerp(xp * self.width as f32, yp * self.height as f32);
             }
-            dist = 2.0 * (rad - dist) / rad;
-            let shade = dist * (xvec + yvec);
-            dist = rad - rad * dist.asin();
-            if dist.is_nan() {
-                return (dist, dist, 0.0)
+            else {
+                dist = 2.0 * (rad - dist) / rad;
+                let shade = dist * (xvec + yvec);
+                dist = rad - rad * dist.asin();
+                if dist.is_nan() {
+                    pix = self.at_lerp(dist, dist);
+                }
+                else {
+                    mshade = shade * 0.5;
+                    pix = self.at_lerp((xvec * dist) + halfwidth, (yvec * dist) + halfheight);
+                }
             }
-            ((xvec * dist) + halfwidth, (yvec * dist) + halfheight, shade * 0.5)
+            if mshade > 0.0 {
+                pix.r = (1.0-mshade) * pix.r + (mshade) * 255.0;
+                pix.g = (1.0-mshade) * pix.g + (mshade) * 255.0;
+                pix.b = (1.0-mshade) * pix.b + (mshade) * 255.0;
+            }
+            else {
+                pix.r = (1.0+mshade) * pix.r;
+                pix.g = (1.0+mshade) * pix.g;
+                pix.b = (1.0+mshade) * pix.b;
+            }
+            pix
         });
         res
     }
