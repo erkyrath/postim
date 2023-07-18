@@ -178,7 +178,7 @@ impl Img<f32> {
             else {
                 let dist2 = 2.0 * (rad - dist) / rad;
                 let shade = dist2 * (xvec + yvec);
-                let dist3 = rad - rad * dist2.asin();
+                let dist3 = rad - 0.5 * rad * (dist2).asin();
                 if dist3.is_nan() {
                     pix = self.at_lerp(dist3, dist3);
                 }
