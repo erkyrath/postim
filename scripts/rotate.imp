@@ -1,10 +1,21 @@
 
+# Store the two values passed in on the command line.
 >>th  >>img
 
+# Compute the sine and cosine of the angle th.
 th cos >>thcos
 th sin >>thsin
 
+# Compute half the size of the image and store as halfwidth, halfheight.
 img size split 0.5 * >>halfheight 0.5 * >>halfwidth
+
+# Now take the image and apply a projection to create a new image.
+
+# The section in braces is a projection function which takes two
+# values (on the stack) and returns two new values (on the stack).
+# That is, the function maps (x,y) to (x',y'). The project operator
+# uses this function to turn img into a new image, which is a rotation
+# of the original.
 
 img {
   halfheight - >>yval
@@ -13,3 +24,4 @@ img {
   thcos yval * thsin xval * - halfheight +
 } project
 
+# The new image is left on the stack.
