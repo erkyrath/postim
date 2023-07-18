@@ -41,6 +41,7 @@ pub enum BuiltInSymbol {
     Average,
     Map,
     MapVal,
+    Project,
     Contrast,
     HalfShift,
     TileBy,
@@ -80,6 +81,7 @@ impl ExecContext {
             "average" => Some(BuiltInSymbol::Average),
             "map" => Some(BuiltInSymbol::Map),
             "mapval" => Some(BuiltInSymbol::MapVal),
+            "project" => Some(BuiltInSymbol::Project),
             "contrast" => Some(BuiltInSymbol::Contrast),
             "halfshift" => Some(BuiltInSymbol::HalfShift),
             "tileby" => Some(BuiltInSymbol::TileBy),
@@ -378,7 +380,7 @@ impl ExecContext {
             },
 
             BuiltInSymbol::Map => {
-                // IMG PROC mapval
+                // IMG PROC map
                 let proc = self.pop_proc("map")?;
                 let img: Rc<Img<f32>> = self.pop_img("map")?;
                 
@@ -405,6 +407,23 @@ impl ExecContext {
                     subctx.execute_proc(&proc, &mut subexecstack, StackValue::Float(*val))?;
                     let fval = subctx.pop_as_float("mapval")?;
                     Ok(fval)
+                })?;
+                self.push_img(res);
+            },
+
+            BuiltInSymbol::Project => {
+                // IMG PROC project
+                let proc = self.pop_proc("project")?;
+                let img: Rc<Img<f32>> = self.pop_img("project")?;
+                
+                let mut subctx = self.clone_env();
+                let mut subexecstack: LendStackIter<ScriptToken> = LendStackIter::new();
+                
+                let res = img.project_mut(|px, py| {
+                    subctx.execute_proc_2(&proc, &mut subexecstack, StackValue::Float(px), StackValue::Float(py))?;
+                    let yval = subctx.pop_as_float("project proc")?;
+                    let xval = subctx.pop_as_float("project proc")?;
+                    Ok((xval, yval))
                 })?;
                 self.push_img(res);
             },
