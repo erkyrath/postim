@@ -122,3 +122,82 @@ pub fn elementwise_2<F>(varg1: StackValue, varg2: StackValue, func: F) -> Result
 
 }
 
+pub fn elementwise_bool_2<F>(varg1: StackValue, varg2: StackValue, func: F) -> Result<StackValue, ExecError>
+    where F: Fn(&f32, &f32) -> bool {
+    
+    let arg2 = if let StackValue::Integer(ival) = varg2 {
+        StackValue::Float(ival as f32)
+    }
+    else {
+        varg2
+    };
+    let arg1 = if let StackValue::Integer(ival) = varg1 {
+        StackValue::Float(ival as f32)
+    }
+    else {
+        varg1
+    };
+    
+    match (arg1, arg2) {
+        (StackValue::Float(f1), StackValue::Float(f2)) => {
+            Ok(StackValue::Integer(if func(&f1, &f2) {1} else {0} ))
+        },
+        (StackValue::Color(p1), StackValue::Color(p2)) => {
+            let res: Pix<f32> = Pix::new(
+                if func(&p1.r, &p2.r) {1.0} else {0.0},
+                if func(&p1.g, &p2.g) {1.0} else {0.0},
+                if func(&p1.b, &p2.b) {1.0} else {0.0});
+            Ok(StackValue::Color(res))
+        },
+        (StackValue::Image(img1), StackValue::Image(img2)) => {
+            if img1.size() != img2.size() {
+                let msg = format!("image sizes do not match: {:?} {:?}", img1, img2);
+                return Err(ExecError::new(&msg));
+            }
+            let res = img1.combine_val(&img2, |xp, yp| if func(xp, yp) {1.0} else {0.0});
+            Ok(StackValue::Image(Rc::new(res)))
+        },
+        (StackValue::Color(pix), StackValue::Float(fl)) => {
+            let res: Pix<f32> = Pix::new(
+                if func(&pix.r, &fl) {1.0} else {0.0},
+                if func(&pix.g, &fl) {1.0} else {0.0},
+                if func(&pix.b, &fl) {1.0} else {0.0});
+            Ok(StackValue::Color(res))
+        },
+        (StackValue::Float(fl), StackValue::Color(pix)) => {
+            let res: Pix<f32> = Pix::new(
+                if func(&fl, &pix.r) {1.0} else {0.0},
+                if func(&fl, &pix.g) {1.0} else {0.0},
+                if func(&fl, &pix.b) {1.0} else {0.0});
+            Ok(StackValue::Color(res))
+        },
+        (StackValue::Image(img), StackValue::Float(fl)) => {
+            let res = img.map_val(|val| if func(val, &fl) {1.0} else {0.0});
+            Ok(StackValue::Image(Rc::new(res)))
+        },
+        (StackValue::Float(fl), StackValue::Image(img)) => {
+            let res = img.map_val(|val| if func(&fl, val) {1.0} else {0.0});
+            Ok(StackValue::Image(Rc::new(res)))
+        },
+        (StackValue::Image(img), StackValue::Color(pix)) => {
+            let res = img.map(|val| Pix::new(
+                if func(&val.r, &pix.r) {1.0} else {0.0},
+                if func(&val.g, &pix.g) {1.0} else {0.0},
+                if func(&val.b, &pix.b) {1.0} else {0.0}));
+            Ok(StackValue::Image(Rc::new(res)))
+        },
+        (StackValue::Color(pix), StackValue::Image(img)) => {
+            let res = img.map(|val| Pix::new(
+                if func(&pix.r, &val.r) {1.0} else {0.0},
+                if func(&pix.g, &val.g) {1.0} else {0.0},
+                if func(&pix.b, &val.b) {1.0} else {0.0}));
+            Ok(StackValue::Image(Rc::new(res)))
+        },
+        (xarg1, xarg2) => {
+            let msg = format!("no arithmetic operation: {:?} {:?}", xarg1, xarg2);
+            Err(ExecError::new(&msg))
+        }
+    }
+
+}
+

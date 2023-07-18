@@ -11,6 +11,7 @@ use crate::exec::except::ExecError;
 use crate::exec::util::elementwise;
 use crate::exec::util::elementwise_bool;
 use crate::exec::util::elementwise_2;
+use crate::exec::util::elementwise_bool_2;
 
 #[derive(Debug, Clone)]
 pub enum BuiltInSymbol {
