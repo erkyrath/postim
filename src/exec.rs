@@ -93,14 +93,12 @@ impl ExecContext {
 
     pub fn execute_proc(&mut self, proc: &Rc<Vec<ScriptToken>>, execstack: &mut LendStackIter<ScriptToken>, inval: StackValue) -> Result<(), ExecError> {
         execstack.push(&proc);
-        self.popall();
         self.push(inval);
         self.execute(execstack)
     }
     
     pub fn execute_proc_2(&mut self, proc: &Rc<Vec<ScriptToken>>, execstack: &mut LendStackIter<ScriptToken>, inval1: StackValue, inval2: StackValue) -> Result<(), ExecError> {
         execstack.push(&proc);
-        self.popall();
         self.push(inval1);
         self.push(inval2);
         self.execute(execstack)
