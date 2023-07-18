@@ -35,6 +35,7 @@ pub enum BuiltInSymbol {
     OpSub,
     OpMul,
     OpDiv,
+    Hypot,
     Shade,
     Sigmoid,
     Average,
@@ -73,6 +74,7 @@ impl ExecContext {
             "-" => Some(BuiltInSymbol::OpSub),
             "*" => Some(BuiltInSymbol::OpMul),
             "/" => Some(BuiltInSymbol::OpDiv),
+            "hypot" => Some(BuiltInSymbol::Hypot),
             "shade" => Some(BuiltInSymbol::Shade),
             "sigmoid" => Some(BuiltInSymbol::Sigmoid),
             "average" => Some(BuiltInSymbol::Average),
@@ -335,6 +337,13 @@ impl ExecContext {
                 let varg2 = self.pop("/")?;
                 let varg1 = self.pop("/")?;
                 let stackval = elementwise_2(varg1, varg2, |v1, v2| v1/v2)?;
+                self.push(stackval);
+            },
+
+            BuiltInSymbol::Hypot => {
+                let varg2 = self.pop("hypot")?;
+                let varg1 = self.pop("hypot")?;
+                let stackval = elementwise_2(varg1, varg2, |v1, v2| v1.hypot(*v2))?;
                 self.push(stackval);
             },
 
