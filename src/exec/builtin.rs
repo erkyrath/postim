@@ -35,6 +35,9 @@ pub enum BuiltInSymbol {
     ACos,
     ATan,
     OpLT,
+    OpGT,
+    OpLTE,
+    OpGTE,
     OpAdd,
     OpSub,
     OpMul,
@@ -77,6 +80,9 @@ impl ExecContext {
             "acos" => Some(BuiltInSymbol::ACos),
             "atan" => Some(BuiltInSymbol::ATan),
             "<" => Some(BuiltInSymbol::OpLT),
+            ">" => Some(BuiltInSymbol::OpGT),
+            "<=" => Some(BuiltInSymbol::OpLTE),
+            ">=" => Some(BuiltInSymbol::OpGTE),
             "+" => Some(BuiltInSymbol::OpAdd),
             "-" => Some(BuiltInSymbol::OpSub),
             "*" => Some(BuiltInSymbol::OpMul),
@@ -330,6 +336,27 @@ impl ExecContext {
                 let varg2 = self.pop("<")?;
                 let varg1 = self.pop("<")?;
                 let stackval = elementwise_bool_2(varg1, varg2, |v1, v2| v1<v2)?;
+                self.push(stackval);
+            },
+
+            BuiltInSymbol::OpGT => {
+                let varg2 = self.pop(">")?;
+                let varg1 = self.pop(">")?;
+                let stackval = elementwise_bool_2(varg1, varg2, |v1, v2| v1>v2)?;
+                self.push(stackval);
+            },
+
+            BuiltInSymbol::OpLTE => {
+                let varg2 = self.pop("<=")?;
+                let varg1 = self.pop("<=")?;
+                let stackval = elementwise_bool_2(varg1, varg2, |v1, v2| v1<=v2)?;
+                self.push(stackval);
+            },
+
+            BuiltInSymbol::OpGTE => {
+                let varg2 = self.pop(">=")?;
+                let varg1 = self.pop(">=")?;
+                let stackval = elementwise_bool_2(varg1, varg2, |v1, v2| v1>=v2)?;
                 self.push(stackval);
             },
 
