@@ -30,6 +30,34 @@ pub fn elementwise<F>(arg: StackValue, func: F) -> Result<StackValue, ExecError>
     }
 }
 
+pub fn elementwise_bool<F>(arg: StackValue, func: F) -> Result<StackValue, ExecError>
+    where F: Fn(&f32) -> bool {
+    
+    match arg {
+        StackValue::Integer(ival) => {
+            Ok(StackValue::Integer(if func(&(ival as f32)) {1} else {0}))
+        },
+        StackValue::Float(fval) => {
+            Ok(StackValue::Integer(if func(&fval) {1} else {0}))
+        },
+        StackValue::Color(pval) => {
+            let res: Pix<f32> = Pix::new(
+                if func(&pval.r) {1.0} else {0.0},
+                if func(&pval.g) {1.0} else {0.0},
+                if func(&pval.b) {1.0} else {0.0});
+            Ok(StackValue::Color(res))
+        },
+        StackValue::Image(img) => {
+            let res = img.map_val(|val| if func(val) {1.0} else {0.0} );
+            Ok(StackValue::Image(Rc::new(res)))
+        },
+        _ => {
+            let msg = format!("no arithmetic operation: {:?}", arg);
+            Err(ExecError::new(&msg))
+        }
+    }
+}
+
 pub fn elementwise_2<F>(varg1: StackValue, varg2: StackValue, func: F) -> Result<StackValue, ExecError>
     where F: Fn(&f32, &f32) -> f32 {
     
