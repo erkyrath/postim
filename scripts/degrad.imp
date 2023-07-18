@@ -1,4 +1,15 @@
 
+# degrad.img IMAGE RADIUS
+
+# Create a new image which contains the high-frequency detail of the
+# original, but with the background averaged out to a flat color.
+# Broad gradients (like, if the image is darker on the left) will be
+# removed.
+#
+# The RADIUS parameter determines the size of the detail filter. If it
+# is small, only fine detail will be preserved. If it is larger, larger
+# features will be kept, but the script will run slower.
+
 >>rad >>img
 
 img rad taxiblur >>blurimg

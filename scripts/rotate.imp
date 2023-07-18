@@ -1,4 +1,8 @@
 
+# rotate.img IMAGE THETA
+
+# Create a new image which is the original rotated THETA radians.
+
 # Store the two values passed in on the command line.
 >>th  >>img
 
