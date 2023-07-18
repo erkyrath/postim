@@ -162,18 +162,18 @@ impl Img<f32> {
     }
 
     pub fn holify(&self, rad: f32) -> Img<f32> {
-        let halfwidth = (self.width/2) as f32;
-        let halfheight = (self.height/2) as f32;
+        let fwidth = self.width as f32;
+        let fheight = self.height as f32;
         let res = Img::new_func(self.width, self.height, |xp, yp| {
-            let xpc = xp * self.width as f32 - halfwidth;
-            let ypc = yp * self.height as f32 - halfheight;
+            let xpc = (xp - 0.5) * fwidth;
+            let ypc = (yp - 0.5) * fheight;
             let mut dist = xpc.hypot(ypc);
             let xvec = xpc / dist;
             let yvec = ypc / dist;
             let mut pix;
             let mut mshade: f32 = 0.0;
             if dist >= rad {
-                pix = self.at_lerp(xp * self.width as f32, yp * self.height as f32);
+                pix = self.at_lerp(xp * fwidth, yp * fheight);
             }
             else {
                 dist = 2.0 * (rad - dist) / rad;
@@ -184,7 +184,7 @@ impl Img<f32> {
                 }
                 else {
                     mshade = shade * 0.5;
-                    pix = self.at_lerp((xvec * dist) + halfwidth, (yvec * dist) + halfheight);
+                    pix = self.at_lerp((xvec * dist) + fwidth*0.5, (yvec * dist) + fheight*0.5);
                 }
             }
             if mshade > 0.0 {
