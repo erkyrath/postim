@@ -49,6 +49,7 @@ pub enum BuiltInSymbol {
     Map,
     MapVal,
     Project,
+    ProjectMap,
     Contrast,
     HalfShift,
     TileBy,
@@ -94,6 +95,7 @@ impl ExecContext {
             "map" => Some(BuiltInSymbol::Map),
             "mapval" => Some(BuiltInSymbol::MapVal),
             "project" => Some(BuiltInSymbol::Project),
+            "projectmap" => Some(BuiltInSymbol::ProjectMap),
             "contrast" => Some(BuiltInSymbol::Contrast),
             "halfshift" => Some(BuiltInSymbol::HalfShift),
             "tileby" => Some(BuiltInSymbol::TileBy),
@@ -471,6 +473,29 @@ impl ExecContext {
                     let yval = subctx.pop_as_float("project proc")?;
                     let xval = subctx.pop_as_float("project proc")?;
                     Ok((xval, yval))
+                })?;
+                self.push_img(res);
+            },
+
+            BuiltInSymbol::ProjectMap => {
+                // IMG PROC PROC projectmap
+                //### or IMG IMG PROC projectmap?
+                let pixproc = self.pop_proc("projectmap")?;
+                let locproc = self.pop_proc("projectmap")?;
+                let img: Rc<Img<f32>> = self.pop_img("projectmap")?;
+                
+                let mut subctx = self.clone_env();
+                let mut subexecstack: LendStackIter<ScriptToken> = LendStackIter::new();
+                
+                let res = img.project_map_mut(|px, py| {
+                    subctx.execute_proc_2(&locproc, &mut subexecstack, StackValue::Float(px), StackValue::Float(py))?;
+                    let yval = subctx.pop_as_float("projectmap locproc")?;
+                    let xval = subctx.pop_as_float("projectmap locproc")?;
+                    Ok((xval, yval))
+                }, |val| {
+                    subctx.execute_proc(&pixproc, &mut subexecstack, StackValue::Color(val.clone()))?;
+                    let pval = subctx.pop_as_color("projectmap pixproc")?;
+                    Ok(pval)
                 })?;
                 self.push_img(res);
             },
