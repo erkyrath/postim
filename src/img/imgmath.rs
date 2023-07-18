@@ -170,6 +170,7 @@ impl Img<f32> {
             let dist = xpc.hypot(ypc);
             let xvec = xpc / dist;
             let yvec = ypc / dist;
+            let factor: f32 = 1.0;
             let mut pix;
             let mut mshade: f32 = 0.0;
             if dist >= rad {
@@ -177,8 +178,8 @@ impl Img<f32> {
             }
             else {
                 let dist2 = 2.0 * (rad - dist) / rad;
-                let shade = dist2 * (xvec + yvec);
-                let dist3 = rad - 0.5 * rad * (dist2).asin();
+                let shade = factor * dist2 * (xvec + yvec);
+                let dist3 = rad - (0.5/factor) * rad * (factor*dist2).asin();
                 if dist3.is_nan() {
                     pix = self.at_lerp(dist3, dist3);
                 }
