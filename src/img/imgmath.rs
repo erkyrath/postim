@@ -167,7 +167,7 @@ impl Img<f32> {
         let res = Img::new_func(self.width, self.height, |xp, yp| {
             let xpc = (xp - 0.5) * fwidth;
             let ypc = (yp - 0.5) * fheight;
-            let mut dist = xpc.hypot(ypc);
+            let dist = xpc.hypot(ypc);
             let xvec = xpc / dist;
             let yvec = ypc / dist;
             let mut pix;
@@ -176,15 +176,15 @@ impl Img<f32> {
                 pix = self.at_lerp(xp * fwidth, yp * fheight);
             }
             else {
-                dist = 2.0 * (rad - dist) / rad;
-                let shade = dist * (xvec + yvec);
-                dist = rad - rad * dist.asin();
-                if dist.is_nan() {
-                    pix = self.at_lerp(dist, dist);
+                let dist2 = 2.0 * (rad - dist) / rad;
+                let shade = dist2 * (xvec + yvec);
+                let dist3 = rad - rad * dist2.asin();
+                if dist3.is_nan() {
+                    pix = self.at_lerp(dist3, dist3);
                 }
                 else {
                     mshade = shade * 0.5;
-                    pix = self.at_lerp((xvec * dist) + fwidth*0.5, (yvec * dist) + fheight*0.5);
+                    pix = self.at_lerp((xvec * dist3) + fwidth*0.5, (yvec * dist3) + fheight*0.5);
                 }
             }
             if mshade > 0.0 {
