@@ -34,6 +34,7 @@ pub enum BuiltInSymbol {
     ASin,
     ACos,
     ATan,
+    OpLT,
     OpAdd,
     OpSub,
     OpMul,
@@ -75,6 +76,7 @@ impl ExecContext {
             "asin" => Some(BuiltInSymbol::ASin),
             "acos" => Some(BuiltInSymbol::ACos),
             "atan" => Some(BuiltInSymbol::ATan),
+            "<" => Some(BuiltInSymbol::OpLT),
             "+" => Some(BuiltInSymbol::OpAdd),
             "-" => Some(BuiltInSymbol::OpSub),
             "*" => Some(BuiltInSymbol::OpMul),
@@ -321,6 +323,13 @@ impl ExecContext {
             BuiltInSymbol::ATan => {
                 let varg = self.pop("atan")?;
                 let stackval = elementwise(varg, |val| val.atan())?;
+                self.push(stackval);
+            },
+
+            BuiltInSymbol::OpLT => {
+                let varg2 = self.pop("<")?;
+                let varg1 = self.pop("<")?;
+                let stackval = elementwise_bool_2(varg1, varg2, |v1, v2| v1<v2)?;
                 self.push(stackval);
             },
 
