@@ -74,3 +74,11 @@ We store the input values as `th` and `img`. (Remember that the angle
 
 The `-o out.ppm` command-line argument writes out the image left on the
 stack.
+
+You can include any number of scripts, arguments, and operators on the
+command line. This comment removes the blue component from an image
+and then rotates it 45 degrees:
+
+```
+cargo run -- test.ppm '{ split pop 0.0 } map' 0.785 scripts/rotate.imp -o out.ppm
+```
