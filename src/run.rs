@@ -2,23 +2,22 @@ use std::error::Error;
 
 use crate::AppOptions;
 
+use crate::args::parse_args;
+use crate::args::Argument;
 use crate::script::Script;
-use crate::script::parse::load_script;
 use crate::exec::ExecContext;
 
 pub fn run(opts: &AppOptions) -> Result<(), Box<dyn Error>> {
 
-    let scripts: Vec<Script> = opts.script
-        .iter()
-        .map(|filename| load_script(&filename))
-        .collect::<Result<Vec<_>, _>>()?;
-
+    let args = parse_args(&opts.args)?;
+    
     let mut ctx = ExecContext::new();
 
-    ctx.loadargs(&opts.infiles)?;
-
-    for script in &scripts {
-        ctx.execute_script(&script)?;
+    for arg in args {
+        match arg {
+            Argument::ScriptArg(script) => { ctx.execute_script(&script)?; },
+            Argument::ImageArg(img) => { ctx.push_img(img); },
+        }
     }
 
     ctx.unloadargs(&opts.outfiles)?;

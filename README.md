@@ -14,7 +14,7 @@ Create an image file called `test.ppm`. It must be in [PPM format][ppm];
 Then type:
 
 ```
-cargo run -- -c scripts/rotate.imp test.ppm 0.2 -o out.ppm
+cargo run -- test.ppm 0.2 scripts/rotate.imp -o out.ppm
 ```
 
 This rotates the image 0.2 radians (11 degrees), and writes it to `out.ppm`.
@@ -66,7 +66,7 @@ img {
 ```
 
 We start with two values on the stack, taken from the command line:
-the image `test.ppm` and the number `0.2`.
+the image `test.ppm` and the number `0.2`. We then run `rotate.imp`.
 
 The `>>foo` notation means "store a value as variable `foo`."
 We store the input values as `th` and `img`. (Remember that the angle

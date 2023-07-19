@@ -206,12 +206,20 @@ where F: Fn(&'a str) -> IResult<&'a str, R, E> {
     )(input)
 }
 
-pub fn load_script(filename: &str) -> Result<Script, String> {
+pub fn load_script_text(body: &str) -> Result<Script, String> {
+    load_script(body, "<ARG>")
+}
+
+pub fn load_script_file(filename: &str) -> Result<Script, String> {
     let body = std::fs::read_to_string(filename)
         .map_err(|err| {
             format!("{}: {}", filename, err.to_string())
         })?;
 
+    load_script(&body, filename)
+}
+
+fn load_script(body: &str, filename: &str) -> Result<Script, String> {
     // parser returns Result<(&str, Vec<ScriptToken>), nom::Err<VerboseError<&str>>>
     
     let (_, rawtokens): (_, Vec<ScriptToken>) = parse_with_termination::<_, _, VerboseError<&str>>(&body, parse_anytokenlist)

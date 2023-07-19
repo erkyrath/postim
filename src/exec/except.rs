@@ -26,6 +26,11 @@ impl Error for ExecError {
     }
 }
 
+impl From<String> for ExecError {
+    fn from(err: String) -> ExecError {
+        return ExecError::new(&err);
+    }
+}
 
 impl From<ppmio::PPMError> for ExecError {
     fn from(err: ppmio::PPMError) -> ExecError {
