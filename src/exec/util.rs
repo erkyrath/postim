@@ -201,3 +201,6 @@ pub fn elementwise_bool_2<F>(varg1: StackValue, varg2: StackValue, func: F) -> R
 
 }
 
+pub fn sigmoid(val: f32, sharp: f32) -> f32 {
+    1.0 / (1.0 + (-sharp*(2.0*val-1.0)).exp())
+}

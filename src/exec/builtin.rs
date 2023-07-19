@@ -12,6 +12,7 @@ use crate::exec::util::elementwise;
 use crate::exec::util::elementwise_bool;
 use crate::exec::util::elementwise_2;
 use crate::exec::util::elementwise_bool_2;
+use crate::exec::util::sigmoid;
 
 #[derive(Debug, Clone)]
 pub enum BuiltInSymbol {
@@ -56,6 +57,7 @@ pub enum BuiltInSymbol {
     Diamond,
     Holify,
     TaxiBlur,
+    Seamless,
 }
 
 impl ExecContext {
@@ -102,6 +104,7 @@ impl ExecContext {
             "diamond" => Some(BuiltInSymbol::Diamond),
             "holify" => Some(BuiltInSymbol::Holify),
             "taxiblur" => Some(BuiltInSymbol::TaxiBlur),
+            "seamless" => Some(BuiltInSymbol::Seamless),
             _ => None,
         }
     }
@@ -552,6 +555,16 @@ impl ExecContext {
                 let res = img.taxiblur(val);
                 self.push_img(res);
             },
+            
+            BuiltInSymbol::Seamless => {
+                // IMG NUM seamless
+                let val = self.pop_as_float("seamless")?;
+                let img: Rc<Img<f32>> = self.pop_img("seamless")?;
+                let imgmask = Img::diamond(img.width, img.height).map_val(|x| sigmoid(*x, val));
+                let imgflip = img.halfshift();
+                let res = img.interp_mask(&imgflip, &imgmask);
+                self.push_img(res);
+            }
         }
         
         Ok(())
