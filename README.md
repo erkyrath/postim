@@ -76,8 +76,9 @@ The `-o out.ppm` command-line argument writes out the image left on the
 stack.
 
 You can include any number of scripts, arguments, and operators on the
-command line. This comment removes the blue component from an image
-and then rotates it 45 degrees:
+command line. Values can be passed from one script to the next on the
+stack. This comment removes the blue component from an image and then
+rotates it 45 degrees:
 
 ```
 cargo run -- test.ppm '{ split pop 0.0 } map' 0.785 scripts/rotate.imp -o out.ppm
