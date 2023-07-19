@@ -77,7 +77,7 @@ stack.
 
 You can include any number of scripts, arguments, and operators on the
 command line. Values can be passed from one script to the next on the
-stack. This comment removes the blue component from an image and then
+stack. This command removes the blue component from an image and then
 rotates it 45 degrees:
 
 ```
