@@ -219,7 +219,7 @@ pub fn load_script_file(filename: &str) -> Result<Script, String> {
     load_script(&body, filename)
 }
 
-fn load_script(body: &str, filename: &str) -> Result<Script, String> {
+fn load_script(body: &str, source: &str) -> Result<Script, String> {
     // parser returns Result<(&str, Vec<ScriptToken>), nom::Err<VerboseError<&str>>>
     
     let (_, rawtokens): (_, Vec<ScriptToken>) = parse_with_termination::<_, _, VerboseError<&str>>(&body, parse_anytokenlist)
@@ -227,14 +227,14 @@ fn load_script(body: &str, filename: &str) -> Result<Script, String> {
             match err {
                 Err::Error(verberr) => {
                     let errstr = nom::error::convert_error::<&str>(&body, verberr);
-                    format!("{}: script format:\n... {}", filename, errstr)
+                    format!("{}: script format:\n... {}", source, errstr)
                 },
                 Err::Failure(verberr) => {
                     let errstr = nom::error::convert_error::<&str>(&body, verberr);
-                    format!("{}: script format:\n... {}", filename, errstr)
+                    format!("{}: script format:\n... {}", source, errstr)
                 },
                 Err::Incomplete(_) => {
-                    format!("{}: incomplete parse", filename)
+                    format!("{}: incomplete parse", source)
                 },
             }
         })?;
@@ -251,7 +251,7 @@ fn load_script(body: &str, filename: &str) -> Result<Script, String> {
                     wasarrow = true;
                 }
                 else if wasarrow {
-                    return Err(format!("{}: arrow needs name, found {:?}", filename, val));
+                    return Err(format!("{}: arrow needs name, found {:?}", source, val));
                 }
                 else {
                     tokens.push(ScriptToken::Name(val));
@@ -268,14 +268,14 @@ fn load_script(body: &str, filename: &str) -> Result<Script, String> {
             }
             other => {
                 if wasarrow {
-                    return Err(format!("{}: arrow needs name, found {:?}", filename, other));
+                    return Err(format!("{}: arrow needs name, found {:?}", source, other));
                 }
                 tokens.push(other);
             },
         }
     }
     if wasarrow {
-        return Err(format!("{}: arrow needs name", filename));
+        return Err(format!("{}: arrow needs name", source));
     }
 
     fn buildwrap(iter: &mut std::vec::IntoIter<ScriptToken>, istop: bool) -> Result<Rc<Vec<ScriptToken>>, String> {
@@ -306,7 +306,7 @@ fn load_script(body: &str, filename: &str) -> Result<Script, String> {
     }
     let wrappedtokens = buildwrap(&mut tokens.into_iter(), true)?; // consume original
 
-    Ok(Script::new(filename, wrappedtokens))
+    Ok(Script::new(source, wrappedtokens))
 }
 
 pub fn match_color(body: &str) -> Option<(u8, u8, u8)>
