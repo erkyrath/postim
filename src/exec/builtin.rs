@@ -567,20 +567,14 @@ impl ExecContext {
                     return Err(ExecError::new(&msg));
                 }
                 let mut res : Img<f32> = Img::new(totalwidth, totalheight);
-                let mut col: usize = 0;
-                let mut row: usize = 0;
-                for img in &imgls {
+                for (index, img) in imgls.iter().enumerate() {
+                    let row = index / width as usize;
+                    let col = index - (row * width as usize);
                     for jx in 0..img.height {
                         for ix in 0..img.width {
                             let pix = img.at(ix, jx);
                             res.set(col*cellwidth+ix, row*cellheight+jx, pix.clone());
                         }
-                    }
-
-                    col += 1;
-                    if col as i32 >= width {
-                        col = 0;
-                        row += 1;
                     }
                 }
                 self.push_img(res);
