@@ -1,5 +1,5 @@
 
-# degrad.img IMAGE RADIUS
+# IMAGE RADIUS degrad.imp
 
 # Create a new image which contains the high-frequency detail of the
 # original, but with the background averaged out to a flat color.

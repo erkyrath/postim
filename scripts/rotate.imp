@@ -1,5 +1,5 @@
 
-# rotate.img IMAGE THETA
+# IMAGE THETA rotate.imp
 
 # Create a new image which is the original rotated THETA radians.
 
