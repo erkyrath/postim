@@ -51,6 +51,7 @@ pub enum BuiltInSymbol {
     MapVal,
     Project,
     ProjectMap,
+    Interpolate,
     Contrast,
     Shift,
     HalfShift,
@@ -100,6 +101,7 @@ impl ExecContext {
             "mapval" => Some(BuiltInSymbol::MapVal),
             "project" => Some(BuiltInSymbol::Project),
             "projectmap" => Some(BuiltInSymbol::ProjectMap),
+            "interpolate" => Some(BuiltInSymbol::Interpolate),
             "contrast" => Some(BuiltInSymbol::Contrast),
             "shift" => Some(BuiltInSymbol::Shift),
             "halfshift" => Some(BuiltInSymbol::HalfShift),
@@ -504,6 +506,16 @@ impl ExecContext {
                 })?;
                 self.push_img(res);
             },
+
+            BuiltInSymbol::Interpolate => {
+                // IMG1 IMG2 IMGMASK interpolate
+                //### or IMG1 IMG2 PROC interpolate?
+                let imgmask: Rc<Img<f32>> = self.pop_img("interpolate")?;
+                let img2: Rc<Img<f32>> = self.pop_img("interpolate")?;
+                let img1: Rc<Img<f32>> = self.pop_img("interpolate")?;
+                let res = img1.interp_mask(&img2, &imgmask);
+                self.push_img(res);
+            }
 
             BuiltInSymbol::Contrast => {
                 // IMG NUM contrast
