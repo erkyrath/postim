@@ -40,10 +40,17 @@ fn parse_string<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, 
         // for escaped chars, see https://github.com/rust-bakery/nom/blob/main/examples/string.rs
         sequence::delimited(
             character::complete::char('"'),
-            bytes::complete::is_not("\""),
+            combinator::opt(bytes::complete::is_not("\"")),
             character::complete::char('"')
         ),
-        |val: &str| ScriptToken::String(val.to_string())
+        |res: Option<&str>| {
+            if let Some(val) = res {
+                ScriptToken::String(val.to_string())
+            }
+            else {
+                ScriptToken::String(String::default())
+            }
+        }
     )(input)
 }
 
