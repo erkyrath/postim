@@ -193,13 +193,12 @@ impl Img<f32> {
             }
             else {
                 let dist2 = 2.0 * (rad - dist) / rad;
-                let shade = factor * dist2 * (xvec + yvec);
                 let dist3 = rad - (0.5/factor) * rad * (factor*dist2).asin();
                 if dist3.is_nan() {
                     pix = self.at_lerp(dist3, dist3);
                 }
                 else {
-                    mshade = shade * 0.5;
+                    mshade = 1.0 * (1.0 - (1.0-factor*factor*dist2*dist2).sqrt()) * (xvec + yvec);
                     pix = self.at_lerp((xvec * dist3) + fwidth*0.5, (yvec * dist3) + fheight*0.5);
                 }
             }
