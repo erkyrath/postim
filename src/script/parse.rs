@@ -16,6 +16,8 @@ use nom::character;
 use crate::script::Script;
 use crate::script::ScriptToken;
 
+// Nom parser docs: https://docs.rs/nom/latest/nom/
+
 fn parse_comment<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     combinator::value(
         ScriptToken::Comment,
