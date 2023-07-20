@@ -546,14 +546,19 @@ impl ExecContext {
 
             BuiltInSymbol::Concat => {
                 // IMG... SIZE tilecat, IMG... NUM NUM tilecat
-                let (width, height) = self.pop_as_size("tilecat")?;
+                let (width, height) = self.pop_as_size("concat")?;
                 if width <= 0 || height <= 0 {
                     let msg = format!("tilecat size must be positive: {width}x{height}");
                     return Err(ExecError::new(&msg));
                 }
                 let imgls: Vec<Rc<Img<f32>>> = (0..width*height)
-                    .map(|_| { self.pop_img("tilecat") })
+                    .map(|_| { self.pop_img("concat") })
                     .collect::<Result<Vec<_>, _>>()?;
+                let (cellwidth, cellheight) = imgls[0].size();
+                if cellwidth * width as usize >= 0x10000 || cellheight * height as usize > 0x10000 {
+                    let msg = format!("concat size is too large: {width}x{height}");
+                    return Err(ExecError::new(&msg));
+                }
                 println!("### images: {:?}", imgls);
             },
 
