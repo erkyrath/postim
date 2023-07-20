@@ -94,6 +94,7 @@ pub fn img_read(filename: &str) -> Result<Img<u8>, PPMError> {
     }
 
     let mut img: Img<u8> = Img::new(width, height);
+    img.filename = Some(filename.to_string());
     
     let mut buf: Vec<u8> = vec![0; 3*img.width];
     for jx in 0..img.height {

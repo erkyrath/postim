@@ -8,6 +8,7 @@ pub mod imgmath;
 pub mod ppmio;
 
 pub struct Img<T> {
+    pub filename: Option<String>,
     pub width: usize,
     pub height: usize,
     pub pixels: Vec<Pix<T>>,
@@ -15,7 +16,10 @@ pub struct Img<T> {
 
 impl<T> fmt::Debug for Img<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "<Img {}x{}>", self.width, self.height)
+        match &self.filename {
+            None => write!(f, "<Img {}x{}>", self.width, self.height),
+            Some(filename) => write!(f, "<Img \"{}\" {}x{}>", filename, self.width, self.height),
+        }
     }
 }
 
@@ -23,6 +27,7 @@ impl<T: Copy> Img<T> {
     pub fn new_grey(width: usize, height: usize, val: T) -> Img<T> {
         let pix: Pix<T> = Pix { r:val, g:val, b:val };
         let res = Img {
+            filename: None,
             width,
             height,
             pixels: vec![pix; width*height],
@@ -36,6 +41,7 @@ impl<T: Default + Clone> Img<T> {
     pub fn new(width: usize, height: usize) -> Img<T> {
         let pix: Pix<T> = Pix::default();
         let res = Img {
+            filename: None,
             width,
             height,
             pixels: vec![pix; width*height],
@@ -92,6 +98,7 @@ impl<T: Default + Clone> Img<T> {
 impl<T: Clone> Img<T> {
     pub fn new_constant(width: usize, height: usize, pix: Pix<T>) -> Img<T> {
         let res = Img {
+            filename: None,
             width,
             height,
             pixels: vec![pix; width*height],
@@ -103,6 +110,7 @@ impl<T: Clone> Img<T> {
     pub fn map_val<F>(&self, func: F) -> Img<T>
     where F: Fn(&T) -> T {
         let mut res = Img {
+            filename: None,
             width: self.width,
             height: self.height,
             pixels: Vec::with_capacity(self.pixcount()),
@@ -119,6 +127,7 @@ impl<T: Clone> Img<T> {
     pub fn map_val_mut<F>(&self, mut func: F) -> Result<Img<T>, ExecError>
     where F: FnMut(&T) -> Result<T, ExecError> {
         let mut res = Img {
+            filename: None,
             width: self.width,
             height: self.height,
             pixels: Vec::with_capacity(self.pixcount()),
@@ -135,6 +144,7 @@ impl<T: Clone> Img<T> {
     pub fn map<F>(&self, func: F) -> Img<T>
     where F: Fn(&Pix<T>) -> Pix<T> {
         let mut res = Img {
+            filename: None,
             width: self.width,
             height: self.height,
             pixels: Vec::with_capacity(self.pixcount()),
@@ -150,6 +160,7 @@ impl<T: Clone> Img<T> {
     pub fn map_mut<F>(&self, mut func: F) -> Result<Img<T>, ExecError>
     where F: FnMut(&Pix<T>) -> Result<Pix<T>, ExecError> {
         let mut res = Img {
+            filename: None,
             width: self.width,
             height: self.height,
             pixels: Vec::with_capacity(self.pixcount()),
@@ -168,6 +179,7 @@ impl<T: Clone> Img<T> {
         assert!(self.height == other.height);
         
         let mut res = Img {
+            filename: None,
             width: self.width,
             height: self.height,
             pixels: Vec::with_capacity(self.pixcount()),
@@ -186,6 +198,7 @@ impl<T: Clone> Img<T> {
         assert!(self.height == other.height);
         
         let mut res = Img {
+            filename: None,
             width: self.width,
             height: self.height,
             pixels: Vec::with_capacity(self.pixcount()),
@@ -202,6 +215,7 @@ impl<T: Clone> Img<T> {
     pub fn convert<U: Clone, F>(&self, func: F) -> Img<U>
     where F: Fn(&T) -> U {
         let mut res = Img {
+            filename: self.filename.clone(),
             width: self.width,
             height: self.height,
             pixels: Vec::with_capacity(self.pixcount()),
