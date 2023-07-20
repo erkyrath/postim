@@ -124,6 +124,21 @@ impl Img<f32> {
         })
     }
     
+    pub fn shift(&self, offx: i32, offy: i32) -> Img<f32> {
+        let mut res: Img<f32> = Img::new(self.width, self.height);
+
+        let uoffx: usize = (self.width as i32 - offx) as usize;
+        let uoffy: usize = (self.height as i32 - offy) as usize;
+        for jx in 0..self.height {
+            for ix in 0..self.width {
+                let pix = self.at((ix+uoffx) % self.width, (jx+uoffy) % self.height);
+                res.set(ix, jx, pix.clone());
+            }
+        }
+        
+        res
+    }
+
     pub fn halfshift(&self) -> Img<f32> {
         let mut res: Img<f32> = Img::new(self.width, self.height);
         

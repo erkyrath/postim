@@ -52,6 +52,7 @@ pub enum BuiltInSymbol {
     Project,
     ProjectMap,
     Contrast,
+    Shift,
     HalfShift,
     TileBy,
     Diamond,
@@ -99,6 +100,7 @@ impl ExecContext {
             "project" => Some(BuiltInSymbol::Project),
             "projectmap" => Some(BuiltInSymbol::ProjectMap),
             "contrast" => Some(BuiltInSymbol::Contrast),
+            "shift" => Some(BuiltInSymbol::Shift),
             "halfshift" => Some(BuiltInSymbol::HalfShift),
             "tileby" => Some(BuiltInSymbol::TileBy),
             "diamond" => Some(BuiltInSymbol::Diamond),
@@ -506,6 +508,14 @@ impl ExecContext {
                 let val = self.pop_as_float("contrast")?;
                 let img: Rc<Img<f32>> = self.pop_img("contrast")?;
                 let res = img.contrast(val);
+                self.push_img(res);
+            },
+
+            BuiltInSymbol::Shift => {
+                // IMG SIZE shift, IMG NUM NUM shift
+                let (width, height) = self.pop_as_size("shift")?;
+                let img: Rc<Img<f32>> = self.pop_img("shift")?;
+                let res = img.shift(width, height);
                 self.push_img(res);
             },
 
