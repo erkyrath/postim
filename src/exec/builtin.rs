@@ -555,11 +555,35 @@ impl ExecContext {
                     .map(|_| { self.pop_img("concat") })
                     .collect::<Result<Vec<_>, _>>()?;
                 let (cellwidth, cellheight) = imgls[0].size();
-                if cellwidth * width as usize >= 0x10000 || cellheight * height as usize > 0x10000 {
-                    let msg = format!("concat size is too large: {width}x{height}");
+                for img in &imgls {
+                    if img.width != cellwidth || img.height != cellheight {
+                        let msg = format!("concat size does not match: {}x{} vs {}x{}", img.width, img.height, cellwidth, cellheight);
+                        return Err(ExecError::new(&msg));
+                    }
+                }
+                let (totalwidth, totalheight) = (cellwidth * width as usize, cellheight * height as usize);
+                if totalwidth >= 0x10000 || totalheight > 0x10000 {
+                    let msg = format!("concat size is too large: {totalwidth}x{totalheight}");
                     return Err(ExecError::new(&msg));
                 }
-                println!("### images: {:?}", imgls);
+                let mut res : Img<f32> = Img::new(totalwidth, totalheight);
+                let mut col: usize = 0;
+                let mut row: usize = 0;
+                for img in &imgls {
+                    for jx in 0..img.height {
+                        for ix in 0..img.width {
+                            let pix = img.at(ix, jx);
+                            res.set(col*cellwidth+ix, row*cellheight+jx, pix.clone());
+                        }
+                    }
+
+                    col += 1;
+                    if col as i32 >= width {
+                        col = 0;
+                        row += 1;
+                    }
+                }
+                self.push_img(res);
             },
 
             BuiltInSymbol::Diamond => {
