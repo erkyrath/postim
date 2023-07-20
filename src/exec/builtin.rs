@@ -55,6 +55,7 @@ pub enum BuiltInSymbol {
     Shift,
     HalfShift,
     TileBy,
+    Concat,
     Diamond,
     Holify,
     TaxiBlur,
@@ -103,6 +104,7 @@ impl ExecContext {
             "shift" => Some(BuiltInSymbol::Shift),
             "halfshift" => Some(BuiltInSymbol::HalfShift),
             "tileby" => Some(BuiltInSymbol::TileBy),
+            "concat" => Some(BuiltInSymbol::Concat),
             "diamond" => Some(BuiltInSymbol::Diamond),
             "holify" => Some(BuiltInSymbol::Holify),
             "taxiblur" => Some(BuiltInSymbol::TaxiBlur),
@@ -540,6 +542,19 @@ impl ExecContext {
                 }
                 let res = img.tile_by(uwidth, uheight);
                 self.push_img(res);
+            },
+
+            BuiltInSymbol::Concat => {
+                // IMG... SIZE tilecat, IMG... NUM NUM tilecat
+                let (width, height) = self.pop_as_size("tilecat")?;
+                if width <= 0 || height <= 0 {
+                    let msg = format!("tilecat size must be positive: {width}x{height}");
+                    return Err(ExecError::new(&msg));
+                }
+                let imgls: Vec<Rc<Img<f32>>> = (0..width*height)
+                    .map(|_| { self.pop_img("tilecat") })
+                    .collect::<Result<Vec<_>, _>>()?;
+                println!("### images: {:?}", imgls);
             },
 
             BuiltInSymbol::Diamond => {
