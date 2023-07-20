@@ -1,0 +1,14 @@
+
+# IMAGE SHARP seamless.imp
+
+# Generates a version of an image which tiles seamlessly.
+# This is a very simple algorithm; it just tiles the center of the
+# image in a diamond-shaped tesselation. The diagonal borders are
+# smoothly interpolated to avoid seams. To sharpen this interpolation,
+# increase the SHARP value. (Try values from 2 to 8 or so.)
+
+>>sharp  >>img
+
+img size diamond  sharp sigmoid  >>imgmask
+
+img  img halfshift  imgmask  interpolate
