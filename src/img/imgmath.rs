@@ -198,7 +198,7 @@ impl Img<f32> {
                     pix = self.at_lerp(dist3, dist3);
                 }
                 else {
-                    mshade = 1.0 * (1.0 - (1.0-factor*factor*dist2*dist2).sqrt()) * (xvec + yvec);
+                    mshade = 0.66 * (1.0 - (1.0-factor*factor*dist2*dist2).sqrt()) * (xvec + yvec);
                     pix = self.at_lerp((xvec * dist3) + fwidth*0.5, (yvec * dist3) + fheight*0.5);
                 }
             }
