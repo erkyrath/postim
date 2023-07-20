@@ -23,7 +23,7 @@ fn parse_comment<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str,
         ScriptToken::Comment,
         sequence::pair(
             character::complete::char('#'),
-            bytes::complete::is_not("\n\r")
+            bytes::complete::take_till(|ch| ch == '\n' || ch == '\r')
         )
     )(input)
 }
