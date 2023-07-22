@@ -1,7 +1,7 @@
 
->> rad  >>img
+>>rad  >>img
 
-img size split 0.5 * >>halfheight 0.5 * >> halfwidth
+img size split 0.5 * >>halfheight 0.5 * >>halfwidth
 
 img {
   halfheight - >>ypc
