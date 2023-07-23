@@ -4,6 +4,7 @@ use crate::img::pixel::Pix;
 use crate::img::Img;
 use crate::img::ppmio;
 use crate::script::ScriptToken;
+use crate::script::parse::load_script_file;
 use crate::exec::StackValue;
 use crate::exec::ExecContext;
 use crate::exec::estack::LendStackIter;
@@ -28,6 +29,7 @@ pub enum BuiltInSymbol {
     Image,
     Write,
     Read,
+    Run,
     IsNan,
     Sin,
     Cos,
@@ -78,6 +80,7 @@ impl ExecContext {
             "image" => Some(BuiltInSymbol::Image),
             "write" => Some(BuiltInSymbol::Write),
             "read" => Some(BuiltInSymbol::Read),
+            "run" => Some(BuiltInSymbol::Run),
             "isnan" => Some(BuiltInSymbol::IsNan),
             "sin" => Some(BuiltInSymbol::Sin),
             "cos" => Some(BuiltInSymbol::Cos),
@@ -299,6 +302,13 @@ impl ExecContext {
                 let name: String = self.pop_str("read")?;
                 let inimg = ppmio::img_read(&name)?;
                 self.push_img(inimg.as_f32());
+            },
+
+            BuiltInSymbol::Run => {
+                // STR read
+                let name: String = self.pop_str("read")?;
+                let script = load_script_file(&name)?;
+                execstack.push(&script.tokens());
             },
 
             BuiltInSymbol::IsNan => {
