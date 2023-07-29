@@ -56,6 +56,8 @@ pub enum BuiltInSymbol {
     Project,
     ProjectMap,
     Interpolate,
+    At,
+    NAt,
     Contrast,
     Shift,
     HalfShift,
@@ -108,6 +110,8 @@ impl ExecContext {
             "mapval" => Some(BuiltInSymbol::MapVal),
             "project" => Some(BuiltInSymbol::Project),
             "projectmap" => Some(BuiltInSymbol::ProjectMap),
+            "at" => Some(BuiltInSymbol::At),
+            "nat" => Some(BuiltInSymbol::NAt),
             "interpolate" => Some(BuiltInSymbol::Interpolate),
             "contrast" => Some(BuiltInSymbol::Contrast),
             "shift" => Some(BuiltInSymbol::Shift),
@@ -536,6 +540,24 @@ impl ExecContext {
                 self.push_img(res);
             },
 
+            BuiltInSymbol::At => {
+                // IMG NUM NUM at
+                let ypos = self.pop_as_float("at")?;
+                let xpos = self.pop_as_float("at")?;
+                let img: Rc<Img<f32>> = self.pop_img("at")?;
+                let res = img.at_lerp(xpos, ypos);
+                self.push_color(res);
+            },
+            
+            BuiltInSymbol::NAt => {
+                // IMG NUM NUM nat
+                let ypos = self.pop_as_float("nat")?;
+                let xpos = self.pop_as_float("nat")?;
+                let img: Rc<Img<f32>> = self.pop_img("nat")?;
+                let res = img.at_lerp(xpos * img.width as f32, ypos * img.height as f32);
+                self.push_color(res);
+            },
+            
             BuiltInSymbol::Interpolate => {
                 // IMG1 IMG2 IMGMASK interpolate
                 //### or IMG1 IMG2 PROC interpolate?
