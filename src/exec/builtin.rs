@@ -37,6 +37,8 @@ pub enum BuiltInSymbol {
     ASin,
     ACos,
     ATan,
+    OpOr,
+    OpAnd,
     OpLT,
     OpGT,
     OpLTE,
@@ -88,6 +90,8 @@ impl ExecContext {
             "asin" => Some(BuiltInSymbol::ASin),
             "acos" => Some(BuiltInSymbol::ACos),
             "atan" => Some(BuiltInSymbol::ATan),
+            "or" => Some(BuiltInSymbol::OpOr),
+            "and" => Some(BuiltInSymbol::OpAnd),
             "<" => Some(BuiltInSymbol::OpLT),
             ">" => Some(BuiltInSymbol::OpGT),
             "<=" => Some(BuiltInSymbol::OpLTE),
@@ -353,6 +357,20 @@ impl ExecContext {
                 self.push(stackval);
             },
 
+            BuiltInSymbol::OpOr => {
+                let flag2 = self.pop_int("or")?;
+                let flag1 = self.pop_int("or")?;
+                let res = flag1 != 0 || flag2 != 0;
+                self.push_int(res as i32);
+            },
+
+            BuiltInSymbol::OpAnd => {
+                let flag2 = self.pop_int("and")?;
+                let flag1 = self.pop_int("and")?;
+                let res = flag1 != 0 && flag2 != 0;
+                self.push_int(res as i32);
+            },
+
             BuiltInSymbol::OpLT => {
                 let varg2 = self.pop("<")?;
                 let varg1 = self.pop("<")?;
@@ -481,6 +499,7 @@ impl ExecContext {
             BuiltInSymbol::Project => {
                 // IMG PROC project
                 //### or IMG IMG project?
+                //### get a SIZE in there?
                 let proc = self.pop_proc("project")?;
                 let img: Rc<Img<f32>> = self.pop_img("project")?;
                 
