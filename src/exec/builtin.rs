@@ -31,6 +31,7 @@ pub enum BuiltInSymbol {
     Read,
     Run,
     IsNan,
+    Pi,
     Sin,
     Cos,
     Tan,
@@ -87,6 +88,7 @@ impl ExecContext {
             "read" => Some(BuiltInSymbol::Read),
             "run" => Some(BuiltInSymbol::Run),
             "isnan" => Some(BuiltInSymbol::IsNan),
+            "pi" => Some(BuiltInSymbol::Pi),
             "sin" => Some(BuiltInSymbol::Sin),
             "cos" => Some(BuiltInSymbol::Cos),
             "tan" => Some(BuiltInSymbol::Tan),
@@ -327,6 +329,10 @@ impl ExecContext {
                 self.push(stackval);                
             },
 
+            BuiltInSymbol::Pi => {
+                self.push_float(std::f32::consts::PI);
+            },
+            
             BuiltInSymbol::Sin => {
                 let varg = self.pop("sin")?;
                 let stackval = elementwise(varg, |val| val.sin())?;
