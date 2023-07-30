@@ -1,4 +1,5 @@
 use std::rc::Rc;
+use rand::Rng;
 
 use crate::img::pixel::Pix;
 use crate::img::Img;
@@ -26,6 +27,7 @@ pub enum BuiltInSymbol {
     If,
     IfElse,
     Break,
+    Random,
     Split,
     Size,
     Color,
@@ -87,6 +89,7 @@ impl ExecContext {
             "if" => Some(BuiltInSymbol::If),
             "ifelse" => Some(BuiltInSymbol::IfElse),
             "break" => Some(BuiltInSymbol::Break),
+            "random" => Some(BuiltInSymbol::Random),
             "split" => Some(BuiltInSymbol::Split),
             "size" => Some(BuiltInSymbol::Size),
             "color" => Some(BuiltInSymbol::Color),
@@ -240,6 +243,24 @@ impl ExecContext {
 
             BuiltInSymbol::Break => {
                 execstack.pop();
+            },
+            
+            BuiltInSymbol::Random => {
+                let stackval = self.pop("random")?;
+                match stackval {
+                    StackValue::Integer(ival) => {
+                        let res: i32;
+                        {
+                            let mut rng = self.rng.borrow_mut();
+                            res = rng.gen_range(0..ival);
+                        }
+                        self.push_int(res);
+                    },
+                    _ => {
+                        let msg = format!("cannot random: {:?}", stackval);
+                        return Err(ExecError::new(&msg));
+                    }
+                }
             },
             
             BuiltInSymbol::Split => {

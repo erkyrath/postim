@@ -1,5 +1,8 @@
 use std::collections::HashMap;
 use std::rc::Rc;
+use std::cell::RefCell;
+use rand::rngs::SmallRng;
+use rand::SeedableRng;
 
 use crate::img::pixel::Pix;
 use crate::img::Img;
@@ -32,6 +35,7 @@ pub enum StackValue {
 pub struct ExecContext {
     stack: Vec<StackValue>,
     heap: HashMap<String, StackValue>,
+    rng: Rc<RefCell<SmallRng>>,
 }
 
 impl ExecContext {
@@ -39,6 +43,7 @@ impl ExecContext {
         ExecContext {
             stack: Vec::new(),
             heap: HashMap::new(),
+            rng: Rc::new(RefCell::new(SmallRng::from_entropy())),
         }
     }
 
@@ -46,6 +51,7 @@ impl ExecContext {
         ExecContext {
             stack: Vec::new(),
             heap: self.heap.clone(),
+            rng: Rc::clone(&self.rng),
         }
     }
 

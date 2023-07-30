@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 gumdrop = "0.8.1"
 nom = "7.1.3"
+rand = { version = "0.8.5", features = ["small_rng"] }
