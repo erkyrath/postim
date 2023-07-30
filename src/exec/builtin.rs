@@ -44,6 +44,7 @@ pub enum BuiltInSymbol {
     OpGT,
     OpLTE,
     OpGTE,
+    OpNeg,
     OpAdd,
     OpSub,
     OpMul,
@@ -101,6 +102,7 @@ impl ExecContext {
             ">" => Some(BuiltInSymbol::OpGT),
             "<=" => Some(BuiltInSymbol::OpLTE),
             ">=" => Some(BuiltInSymbol::OpGTE),
+            "neg" => Some(BuiltInSymbol::OpNeg),
             "+" => Some(BuiltInSymbol::OpAdd),
             "-" => Some(BuiltInSymbol::OpSub),
             "*" => Some(BuiltInSymbol::OpMul),
@@ -411,6 +413,12 @@ impl ExecContext {
                 self.push(stackval);
             },
 
+            BuiltInSymbol::OpNeg => {
+                let varg = self.pop("acos")?;
+                let stackval = elementwise(varg, |val| -val)?;
+                self.push(stackval);                
+            },
+            
             BuiltInSymbol::OpAdd => {
                 let varg2 = self.pop("+")?;
                 let varg1 = self.pop("+")?;
