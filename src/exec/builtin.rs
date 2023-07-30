@@ -249,6 +249,10 @@ impl ExecContext {
                 let stackval = self.pop("random")?;
                 match stackval {
                     StackValue::Integer(ival) => {
+                        if ival <= 0 {
+                            let msg = format!("random integer range must be positive: {ival}");
+                            return Err(ExecError::new(&msg));
+                        }
                         let res: i32;
                         {
                             let mut rng = self.rng.borrow_mut();
