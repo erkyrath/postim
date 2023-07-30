@@ -58,7 +58,7 @@ fn parse_tokterminator<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'
     branch::alt((
         combinator::eof,
         character::complete::multispace1,
-        bytes::complete::take_while1(|ch: char| ch == '#' || ch == '-' || ch == '+' || ch == '*' || ch == '/' || ch == '=' || ch == '<' || ch == '>' || ch == '&' || ch == '|' || ch == '}' || ch == '{')
+        bytes::complete::take_while1(|ch: char| ch == '#' || ch == '-' || ch == '+' || ch == '*' || ch == '/' || ch == '=' || ch == '<' || ch == '>' || ch == '&' || ch == '|' || ch == '}' || ch == '{' || ch == ']' || ch == '[')
     ))(input)
 }
 
@@ -89,7 +89,7 @@ fn parse_operator<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str
 fn parse_delimiter<'a, E: ParseError<&'a str>>(input: &'a str) -> IResult<&'a str, ScriptToken, E> {
     combinator::map(
         combinator::recognize(
-            character::complete::one_of("{}")
+            character::complete::one_of("{}[]")
         ),
         |val: &str| ScriptToken::Delimiter(val.to_string())
     )(input)
@@ -300,6 +300,10 @@ fn load_script(body: &str, source: &str) -> Result<Script, String> {
                 else if delim == "{" {
                     let proc = buildwrap(iter, false)?;
                     ls.push(ScriptToken::Proc(proc));
+                    continue;
+                }
+                else if delim == "[" || delim == "]" {
+                    ls.push(ScriptToken::Name(delim));
                     continue;
                 }
                 else {
