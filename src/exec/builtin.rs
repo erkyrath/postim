@@ -253,11 +253,10 @@ impl ExecContext {
                             let msg = format!("random integer range must be positive: {ival}");
                             return Err(ExecError::new(&msg));
                         }
-                        let res: i32;
-                        {
+                        let res: i32 = {
                             let mut rng = self.rng.borrow_mut();
-                            res = rng.gen_range(0..ival);
-                        }
+                            rng.gen_range(0..ival)
+                        };
                         self.push_int(res);
                     },
                     _ => {
