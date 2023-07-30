@@ -82,6 +82,18 @@ impl ExecContext {
         }
     }
 
+    pub fn pop_array(&mut self, label: &str) -> Result<Rc<Vec<StackValue>>, ExecError> {
+        let val = self.pop(label)?;
+        
+        if let StackValue::Array(arr) = val {
+            Ok(arr)
+        }
+        else {
+            let msg = format!("{} needs array: {:?}", label, val);
+            Err(ExecError::new(&msg))
+        }
+    }
+
     pub fn pop_as_float(&mut self, label: &str) -> Result<f32, ExecError> {
         let val = self.pop(label)?;
 

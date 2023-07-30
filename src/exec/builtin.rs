@@ -28,6 +28,7 @@ pub enum BuiltInSymbol {
     Eval,
     If,
     IfElse,
+    Cond,
     Break,
     Random,
     Split,
@@ -90,6 +91,7 @@ impl ExecContext {
             "eval" => Some(BuiltInSymbol::Eval),
             "if" => Some(BuiltInSymbol::If),
             "ifelse" => Some(BuiltInSymbol::IfElse),
+            "cond" => Some(BuiltInSymbol::Cond),
             "break" => Some(BuiltInSymbol::Break),
             "random" => Some(BuiltInSymbol::Random),
             "split" => Some(BuiltInSymbol::Split),
@@ -243,6 +245,39 @@ impl ExecContext {
                 }
             },
 
+            BuiltInSymbol::Cond => {
+                // [ PROC1 FLAG1 PROC2 FLAG2 ... ] cond
+                // [ PROC1 FLAG1 PROC2 FLAG2 ... PROCELSE ] cond
+                let arr = self.pop_array("cond")?;
+                let mut res: Option<&StackValue> = None;
+                let mut index = 0;
+                while index+1 < arr.len() {
+                    if let StackValue::Integer(ival) = arr[index+1] {
+                        if ival != 0 {
+                            res = Some(&arr[index]);
+                            break;
+                        }
+                    }
+                    else {
+                        let msg = format!("cond entry needs int: {:?}", arr[index]);
+                        return Err(ExecError::new(&msg));
+                    }
+
+                    index += 2;
+                }
+                if res.is_none() && index < arr.len() {
+                    res = Some(&arr[index]);
+                }
+                if let Some(val) = res {
+                    if let StackValue::Proc(proc) = val {
+                        execstack.push(&proc);
+                    }
+                    else {
+                        self.push(val.clone());
+                    }
+                }
+            },
+            
             BuiltInSymbol::Break => {
                 execstack.pop();
             },
