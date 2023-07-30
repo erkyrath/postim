@@ -1,5 +1,7 @@
 use std::rc::Rc;
 use rand::Rng;
+use rand::rngs::SmallRng;
+use rand::seq::SliceRandom;
 
 use crate::img::pixel::Pix;
 use crate::img::Img;
@@ -271,15 +273,11 @@ impl ExecContext {
                         self.push_float(res);
                     },
                     StackValue::Array(arr) => {
-                        if arr.len() == 0 {
-                            let msg = format!("random array must be nonempty");
-                            return Err(ExecError::new(&msg));
-                        }
-                        let res: usize = {
+                        let res = {
                             let mut rng = self.rng.borrow_mut();
-                            rng.gen_range(0..arr.len())
-                        };
-                        self.push(arr[res].clone());
+                            arr.choose::<SmallRng>(&mut rng)
+                        }.ok_or_else(|| ExecError::new("random array must be nonempty") )?;
+                        self.push(res.clone());
                     }
                     _ => {
                         let msg = format!("cannot random: {:?}", stackval);
