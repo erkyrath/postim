@@ -23,6 +23,7 @@ pub enum BuiltInSymbol {
     Eval,
     If,
     IfElse,
+    Break,
     Split,
     Size,
     Color,
@@ -81,6 +82,7 @@ impl ExecContext {
             "eval" => Some(BuiltInSymbol::Eval),
             "if" => Some(BuiltInSymbol::If),
             "ifelse" => Some(BuiltInSymbol::IfElse),
+            "break" => Some(BuiltInSymbol::Break),
             "split" => Some(BuiltInSymbol::Split),
             "size" => Some(BuiltInSymbol::Size),
             "color" => Some(BuiltInSymbol::Color),
@@ -215,7 +217,11 @@ impl ExecContext {
                         self.push(val2);
                     }
                 }
-            }
+            },
+
+            BuiltInSymbol::Break => {
+                execstack.pop();
+            },
             
             BuiltInSymbol::Split => {
                 // COLOR split, SIZE split
