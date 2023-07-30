@@ -270,6 +270,17 @@ impl ExecContext {
                         };
                         self.push_float(res);
                     },
+                    StackValue::Array(arr) => {
+                        if arr.len() == 0 {
+                            let msg = format!("random array must be nonempty");
+                            return Err(ExecError::new(&msg));
+                        }
+                        let res: usize = {
+                            let mut rng = self.rng.borrow_mut();
+                            rng.gen_range(0..arr.len())
+                        };
+                        self.push(arr[res].clone());
+                    }
                     _ => {
                         let msg = format!("cannot random: {:?}", stackval);
                         return Err(ExecError::new(&msg));
