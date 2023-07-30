@@ -181,4 +181,8 @@ impl ExecContext {
         self.stack.push(StackValue::Image(Rc::new(val)));
     }
 
+    pub fn push_array(&mut self, val: Vec<StackValue>) {
+        self.stack.push(StackValue::Array(Rc::new(val)));
+    }
+
 }

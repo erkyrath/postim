@@ -17,6 +17,8 @@ use crate::exec::util::sigmoid;
 
 #[derive(Debug, Clone)]
 pub enum BuiltInSymbol {
+    Mark,
+    Array,
     Dup,
     Pop,
     Swap,
@@ -76,6 +78,8 @@ pub enum BuiltInSymbol {
 impl ExecContext {
     pub fn search_builtin(&self, tok: &str) -> Option<BuiltInSymbol> {
         match tok {
+            "[" => Some(BuiltInSymbol::Mark),
+            "]" => Some(BuiltInSymbol::Array),
             "dup" => Some(BuiltInSymbol::Dup),
             "pop" => Some(BuiltInSymbol::Pop),
             "swap" => Some(BuiltInSymbol::Swap),
@@ -137,6 +141,21 @@ impl ExecContext {
     pub fn execute_builtin(&mut self, sym: BuiltInSymbol, execstack: &mut LendStackIter<ScriptToken>) -> Result<(), ExecError> {
         match sym {
         
+            BuiltInSymbol::Mark => {
+                self.push(StackValue::Mark);
+            },
+            
+            BuiltInSymbol::Array => {
+                let pos = self.stack.iter().rposition(|val| match val {
+                    StackValue::Mark => true,
+                    _ => false,
+                })
+                    .ok_or_else(|| ExecError::new("no array mark on stack") )?;
+                let tail = self.stack.split_off(pos+1);
+                let _ = self.pop("array")?;
+                self.push_array(tail);
+            },
+            
             BuiltInSymbol::Dup => {
                 let stackval = self.stack.last()
                     .ok_or_else(|| ExecError::new("stack underflow") )?;

@@ -18,6 +18,7 @@ pub mod util;
 
 #[derive(Debug, Clone)]
 pub enum StackValue {
+    Mark,
     String(String),
     Integer(i32),
     Float(f32),
@@ -25,6 +26,7 @@ pub enum StackValue {
     Color(Pix<f32>),
     Image(Rc<Img<f32>>),
     Proc(Rc<Vec<ScriptToken>>),
+    Array(Rc<Vec<StackValue>>),
 }
 
 pub struct ExecContext {
