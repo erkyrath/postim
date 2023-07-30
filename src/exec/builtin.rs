@@ -259,6 +259,17 @@ impl ExecContext {
                         };
                         self.push_int(res);
                     },
+                    StackValue::Float(fval) => {
+                        if fval <= 0.0 {
+                            let msg = format!("random float range must be positive: {fval}");
+                            return Err(ExecError::new(&msg));
+                        }
+                        let res: f32 = {
+                            let mut rng = self.rng.borrow_mut();
+                            rng.gen_range(0.0..fval)
+                        };
+                        self.push_float(res);
+                    },
                     _ => {
                         let msg = format!("cannot random: {:?}", stackval);
                         return Err(ExecError::new(&msg));
